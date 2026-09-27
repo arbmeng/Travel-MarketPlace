@@ -64,6 +64,40 @@ export const HISTORICAL_IMAGES = [
   u("photo-1470252649378-9c29740c9fa8"), // golden countryside at sunset
 ];
 
+export const ISTANBUL_IMAGES = [
+  u("photo-1524231757912-21f4fe3a7200"), // Galata Tower and Istanbul skyline
+  u("photo-1527838832700-5059252407fa"), // mosque silhouette over the Bosphorus at dusk
+  u("photo-1541432901042-2d8bd64b4a9b"), // Sultan Ahmed (Blue) Mosque
+  u("photo-1546268060-2592ff93ee24"), // aerial view of the Bosphorus and old city
+];
+
+export const DUBAI_IMAGES = [
+  u("photo-1518684079-3c830dcef090"), // Burj Al Arab
+  u("photo-1512453979798-5ea266f8880c"), // Dubai highway interchange, skyline
+  u("photo-1512632578888-169bbbc64f33"), // Sheikh Zayed Grand Mosque, UAE
+  u("photo-1528702748617-c64d49f918af"), // Dubai skyline with camels in the foreground
+];
+
+export const KUALA_LUMPUR_IMAGES = [
+  u("photo-1596422846543-75c6fc197f07"), // Petronas Twin Towers at dusk
+  u("photo-1580418827493-f2b22c0a76cb"), // Kuala Lumpur skyline
+  u("photo-1553603227-2358aabe821e"), // tropical island, Malaysia
+];
+
+export const CAIRO_IMAGES = [
+  u("photo-1503177119275-0aa32b3a9368"), // Great Pyramid of Giza
+  u("photo-1553913861-c0fddf2619ee"), // Sphinx and pyramid
+  u("photo-1539768942893-daf53e448371"), // camels and pyramids at sunset
+  u("photo-1572252009286-268acec5ca0a"), // Cairo cityscape with mosque minarets
+];
+
+export const FLIGHT_IMAGES = [
+  u("photo-1436491865332-7a61a109cc05"), // airplane wing above the clouds
+  u("photo-1569154941061-e231b4725ef1"), // airplane on the tarmac
+];
+
+export const TRAVEL_PREP_IMAGE = u("photo-1488646953014-85cb44e25828"); // passport, camera and map flatlay
+
 export function avatar(seed: string) {
   return `https://api.dicebear.com/9.x/notionists/svg?seed=${encodeURIComponent(seed)}&backgroundColor=EAF3F1,F4EFE4`;
 }

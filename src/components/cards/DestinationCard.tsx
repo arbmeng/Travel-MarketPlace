@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
 import { Rating } from "@/components/ui/Rating";
+import { Badge } from "@/components/ui/Badge";
+import { GlobeIcon } from "@/components/icons";
 import type { Destination } from "@/types";
 import { cn } from "@/lib/utils";
 import { getTripsByDestination } from "@/data/mock";
@@ -21,6 +23,11 @@ export function DestinationCard({ destination, className }: { destination: Desti
         className="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
+      {destination.scope === "international" && (
+        <Badge tone="info" icon={<GlobeIcon className="size-3.5" />} className="absolute end-3 top-3 z-10 bg-white/90 backdrop-blur">
+          دەرەوەی وڵات
+        </Badge>
+      )}
       <div className="relative z-10 flex flex-col gap-1 p-4 text-white">
         <span className="text-xs font-medium text-white/80">{destination.governorate}</span>
         <h3 className="text-xl font-extrabold">{destination.name}</h3>

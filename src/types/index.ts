@@ -91,10 +91,31 @@ export interface Governorate {
   name: string;
 }
 
+export type TravelScope = "domestic" | "international";
+
+export const TRAVEL_SCOPE_LABELS: Record<TravelScope, string> = {
+  domestic: "کوردستان",
+  international: "دەرەوەی وڵات",
+};
+
+export interface VisaInfo {
+  required: boolean;
+  description: string;
+  passportValidityMonths: number;
+}
+
+export interface CurrencyInfo {
+  name: string;
+  code: string;
+  symbol: string;
+  exchangeNote: string;
+}
+
 export interface Destination {
   id: string;
   slug: string;
   name: string;
+  /** Governorate name for domestic destinations, country name for international ones. */
   governorate: string;
   tagline: string;
   description: string;
@@ -106,6 +127,10 @@ export interface Destination {
   lat: number;
   lng: number;
   featured?: boolean;
+  scope: TravelScope;
+  visaInfo?: VisaInfo;
+  currencyInfo?: CurrencyInfo;
+  spokenLanguages?: string[];
 }
 
 export interface Agency {
@@ -136,6 +161,14 @@ export interface ItineraryDay {
   meals: string[];
   transportation: string;
   accommodation?: string;
+}
+
+export interface FlightInfo {
+  departureCity: string;
+  arrivalCity: string;
+  airline: string;
+  durationHours: number;
+  layovers: number;
 }
 
 export interface Trip {
@@ -176,6 +209,8 @@ export interface Trip {
   whatToBring: string[];
   familyFriendly?: boolean;
   privateAvailable?: boolean;
+  scope: TravelScope;
+  flightInfo?: FlightInfo;
 }
 
 export interface Review {

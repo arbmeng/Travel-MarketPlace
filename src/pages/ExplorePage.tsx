@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { buttonClassName } from "@/components/ui/Button";
 import { Chip } from "@/components/ui/Badge";
 import { Select } from "@/components/ui/Input";
@@ -8,10 +8,13 @@ import { BottomSheet } from "@/components/ui/Modal";
 import { EmptyState, TripCardSkeleton } from "@/components/ui/States";
 import { TripCard } from "@/components/cards/TripCard";
 import { FilterIcon, MapPinIcon, SearchIcon } from "@/components/icons";
-import { DESTINATIONS, GOVERNORATES, TRIPS, getDestinationById } from "@/data/mock";
+import { COUNTRIES, DESTINATIONS, GOVERNORATES, TRIPS, getDestinationById } from "@/data/mock";
 import { formatNumber } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { DIFFICULTY_LABELS, TRIP_CATEGORY_LABELS, type Difficulty, type Trip, type TripCategory } from "@/types";
+import { DIFFICULTY_LABELS, TRAVEL_SCOPE_LABELS, TRIP_CATEGORY_LABELS, type Difficulty, type Trip, type TravelScope, type TripCategory } from "@/types";
+
+type ScopeFilter = "all" | TravelScope;
+const SCOPE_OPTIONS: ScopeFilter[] = ["all", "domestic", "international"];
 
 const CATEGORIES: TripCategory[] = ["nature", "adventure", "family", "romantic", "historical", "camping", "hiking", "food", "luxury"];
 const DIFFICULTIES: Difficulty[] = ["easy", "moderate", "hard"];
@@ -38,12 +41,13 @@ const SORT_OPTIONS: { key: SortKey; label: string }[] = [
   { key: "newest", label: "نوێترین" },
 ];
 
-const MAX_PRICE = 350000;
+const MAX_PRICE = Math.ceil(Math.max(...TRIPS.map((t) => t.priceIqd)) / 50000) * 50000;
 const TRANSPORT_OPTIONS = Array.from(new Set(TRIPS.map((t) => t.transportation)));
 const ACCOMMODATION_OPTIONS = Array.from(new Set(TRIPS.map((t) => t.accommodation).filter((a) => a && a !== "-")));
 const ACTIVITY_OPTIONS = Array.from(new Set(DESTINATIONS.flatMap((d) => d.activities)));
 
 interface Filters {
+  scope: ScopeFilter;
   destinationId: string;
   governorate: string;
   categories: TripCategory[];
@@ -60,6 +64,7 @@ interface Filters {
 }
 
 const DEFAULT_FILTERS: Filters = {
+  scope: "all",
   destinationId: "all",
   governorate: "all",
   categories: [],
@@ -81,6 +86,7 @@ function toggleInArray<T>(arr: T[], value: T): T[] {
 
 function matchesFilters(trip: Trip, filters: Filters): boolean {
   const destination = getDestinationById(trip.destinationId);
+  if (filters.scope !== "all" && trip.scope !== filters.scope) return false;
   if (filters.destinationId !== "all" && trip.destinationId !== filters.destinationId) return false;
   if (filters.governorate !== "all" && destination?.governorate !== filters.governorate) return false;
   if (filters.categories.length && !filters.categories.includes(trip.category)) return false;
@@ -115,7 +121,11 @@ function sortTrips(list: Trip[], key: SortKey): Trip[] {
 }
 
 export default function ExplorePage() {
-  const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
+  const [searchParams] = useSearchParams();
+  const [filters, setFilters] = useState<Filters>(() => {
+    const urlScope = searchParams.get("scope");
+    return urlScope === "domestic" || urlScope === "international" ? { ...DEFAULT_FILTERS, scope: urlScope } : DEFAULT_FILTERS;
+  });
   const [sortKey, setSortKey] = useState<SortKey>("recommended");
   const [sheetOpen, setSheetOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -150,11 +160,18 @@ export default function ExplorePage() {
 
   return (
     <div className="mx-auto max-w-(--breakpoint-2xl) px-4 py-8 sm:px-6 lg:py-10">
-      <div className="mb-6 flex flex-col gap-1.5">
+      <div className="mb-6 flex flex-col gap-3">
         <h1 className="text-2xl font-extrabold text-(--color-text-primary) sm:text-3xl">بگەڕێ بۆ گەشتەکان</h1>
         <p className="text-(--color-text-secondary)">
-          <span className="num font-semibold text-(--color-text-primary)">{results.length}</span> گەشت دۆزرایەوە لە کوردستان
+          <span className="num font-semibold text-(--color-text-primary)">{results.length}</span> گەشت دۆزرایەوە
         </p>
+        <div className="flex flex-wrap gap-2">
+          {SCOPE_OPTIONS.map((s) => (
+            <Chip key={s} selected={filters.scope === s} onClick={() => update("scope", s)}>
+              {s === "all" ? "هەموو گەشتەکان" : TRAVEL_SCOPE_LABELS[s]}
+            </Chip>
+          ))}
+        </div>
       </div>
 
       {/* Mobile sticky filter/sort bar */}
@@ -286,10 +303,10 @@ function FiltersPanel({ filters, update }: { filters: Filters; update: <K extend
         </Select>
       </FilterGroup>
 
-      <FilterGroup title="پارێزگا">
+      <FilterGroup title={filters.scope === "international" ? "وڵات" : "پارێزگا"}>
         <Select value={filters.governorate} onChange={(e) => update("governorate", e.target.value)}>
-          <option value="all">هەموو پارێزگاکان</option>
-          {GOVERNORATES.map((g) => (
+          <option value="all">{filters.scope === "international" ? "هەموو وڵاتان" : "هەموو پارێزگاکان"}</option>
+          {(filters.scope === "international" ? COUNTRIES : GOVERNORATES).map((g) => (
             <option key={g.id} value={g.name}>
               {g.name}
             </option>
@@ -337,7 +354,7 @@ function FiltersPanel({ filters, update }: { filters: Filters; update: <K extend
             type="range"
             min={0}
             max={MAX_PRICE}
-            step={5000}
+            step={25000}
             value={filters.maxPrice}
             onChange={(e) => update("maxPrice", Number(e.target.value))}
             className="w-full accent-(--color-primary)"

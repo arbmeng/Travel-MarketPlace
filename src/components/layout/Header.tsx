@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { Logo } from "@/components/layout/Logo";
-import { BellIcon, HeartIcon, MenuIcon, MessageIcon, SearchIcon, UserIcon } from "@/components/icons";
+import { BellIcon, GlobeIcon, HeartIcon, MenuIcon, MessageIcon, SearchIcon, UserIcon } from "@/components/icons";
 import { NOTIFICATIONS } from "@/data/mock";
 import { cn } from "@/lib/utils";
 
@@ -50,6 +50,13 @@ export function Header() {
               {link.label}
             </NavLink>
           ))}
+          <Link
+            to="/explore?scope=international"
+            className="flex items-center gap-1.5 rounded-(--radius-pill) bg-(--color-secondary)/10 px-4 py-2 text-sm font-semibold text-(--color-secondary-dark) transition-colors hover:bg-(--color-secondary)/20"
+          >
+            <GlobeIcon className="size-4" />
+            دەرەوەی وڵات
+          </Link>
         </nav>
 
         <div className="flex items-center gap-1.5 sm:gap-2">
@@ -114,6 +121,14 @@ export function Header() {
                 {link.label}
               </NavLink>
             ))}
+            <Link
+              to="/explore?scope=international"
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center gap-1.5 rounded-(--radius-md) px-3 py-2.5 text-sm font-semibold text-(--color-secondary-dark)"
+            >
+              <GlobeIcon className="size-4" />
+              دەرەوەی وڵات
+            </Link>
             <div className="mt-2 border-t border-(--color-border) pt-2">
               <CurrencyLanguageSwitcher />
             </div>

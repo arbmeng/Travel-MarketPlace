@@ -118,6 +118,11 @@ function TripDetail({ slug }: { slug: string }) {
           <section>
             <div className="mb-2 flex flex-wrap items-center gap-2">
               <Badge tone="primary">{TRIP_CATEGORY_LABELS[trip.category]}</Badge>
+              {trip.scope === "international" && (
+                <Badge tone="info" icon={<GlobeIcon className="size-3.5" />}>
+                  دەرەوەی وڵات
+                </Badge>
+              )}
               {urgent && <Badge tone="warning">تەنها {trip.spotsRemaining} شوێن ماوە</Badge>}
             </div>
             <div className="flex items-start justify-between gap-4">
@@ -156,6 +161,45 @@ function TripDetail({ slug }: { slug: string }) {
             <FactItem icon={<CompassIcon className="size-5" />} label="مانەوە" value={trip.accommodation === "-" ? "بێ مانەوە" : trip.accommodation} />
             <FactItem icon={<CompassIcon className="size-5" />} label="ژەمەکان" value={trip.meals} />
           </section>
+
+          {/* Flight details (international only) */}
+          {trip.flightInfo && (
+            <section>
+              <h2 className="mb-3 text-xl font-extrabold text-(--color-text-primary)">زانیاری فڕۆکە</h2>
+              <div className="grid grid-cols-2 gap-4 rounded-(--radius-lg) bg-(--color-surface-elevated) p-5 sm:grid-cols-4">
+                <FactItem icon={<CompassIcon className="size-5" />} label="بەڕێکەوتن لە" value={trip.flightInfo.departureCity} />
+                <FactItem icon={<MapPinIcon className="size-5" />} label="گەیشتن بۆ" value={trip.flightInfo.arrivalCity} />
+                <FactItem icon={<GlobeIcon className="size-5" />} label="کۆمپانیای فڕۆکەوانی" value={trip.flightInfo.airline} />
+                <FactItem
+                  icon={<ClockIcon className="size-5" />}
+                  label="ماوەی فڕین"
+                  value={trip.flightInfo.layovers > 0 ? `${trip.flightInfo.durationHours} کاتژمێر (${trip.flightInfo.layovers} وەستان)` : `${trip.flightInfo.durationHours} کاتژمێر (ڕاستەوخۆ)`}
+                />
+              </div>
+            </section>
+          )}
+
+          {/* Visa, currency & language (international only) */}
+          {destination?.scope === "international" && destination.visaInfo && (
+            <section>
+              <h2 className="mb-3 text-xl font-extrabold text-(--color-text-primary)">ڤیزا، دراو و زمان</h2>
+              <div className="flex flex-col gap-4 rounded-(--radius-lg) bg-(--color-info-bg) p-5">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge tone={destination.visaInfo.required ? "warning" : "success"}>
+                    {destination.visaInfo.required ? "ڤیزا پێویستە" : "بەبێ ڤیزای پێشوەخت"}
+                  </Badge>
+                  {destination.currencyInfo && (
+                    <Badge tone="neutral">دراو: {destination.currencyInfo.name} ({destination.currencyInfo.symbol})</Badge>
+                  )}
+                  {destination.spokenLanguages && <Badge tone="neutral">زمان: {destination.spokenLanguages[0]}</Badge>}
+                </div>
+                <p className="text-sm leading-relaxed text-(--color-text-primary)">{destination.visaInfo.description}</p>
+                <Link to={`/destinations/${destination.slug}`} className="text-xs font-semibold text-(--color-primary) underline">
+                  زانیاری تەواو سەبارەت بە {destination.name} ببینە
+                </Link>
+              </div>
+            </section>
+          )}
 
           {/* Description */}
           <section>

@@ -94,6 +94,7 @@ function makeTrip(partial: {
     whatToBring: ["پێڵاوی ئاسان", "ئاو", "کامێرا"],
     familyFriendly: true,
     privateAvailable: false,
+    scope: "domestic",
   };
 }
 

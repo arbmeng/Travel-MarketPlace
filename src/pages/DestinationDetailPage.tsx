@@ -3,11 +3,12 @@ import { Link, useParams } from "react-router-dom";
 import { buttonClassName } from "@/components/ui/Button";
 import { Rating } from "@/components/ui/Rating";
 import { SaveButton } from "@/components/ui/SaveButton";
+import { Badge } from "@/components/ui/Badge";
 import { EmptyState } from "@/components/ui/States";
 import { TripCard } from "@/components/cards/TripCard";
 import { DestinationCard } from "@/components/cards/DestinationCard";
 import { ReviewCard } from "@/components/cards/ReviewCard";
-import { CalendarIcon, MapPinIcon, ShareIcon } from "@/components/icons";
+import { CalendarIcon, GlobeIcon, MapPinIcon, ShareIcon } from "@/components/icons";
 import { DESTINATIONS, REVIEWS, getDestinationBySlug, getTripsByDestination } from "@/data/mock";
 import { cn } from "@/lib/utils";
 
@@ -114,6 +115,48 @@ export default function DestinationDetailPage() {
             </div>
           </section>
 
+          {/* Visa & passport (international only) */}
+          {destination.scope === "international" && destination.visaInfo && (
+            <section>
+              <h2 className="mb-3 flex items-center gap-2 text-xl font-extrabold text-(--color-text-primary)">
+                <GlobeIcon className="size-5 text-(--color-primary)" />
+                ڤیزا و پاسپۆرت
+              </h2>
+              <div className="flex flex-col gap-3 rounded-(--radius-lg) bg-(--color-info-bg) p-5">
+                <div className="flex items-center gap-2">
+                  <Badge tone={destination.visaInfo.required ? "warning" : "success"}>
+                    {destination.visaInfo.required ? "ڤیزا پێویستە" : "بەبێ ڤیزای پێشوەخت"}
+                  </Badge>
+                  <Badge tone="neutral">پاسپۆرت پێویستە بۆ لانیکەم {destination.visaInfo.passportValidityMonths} مانگ</Badge>
+                </div>
+                <p className="text-sm leading-relaxed text-(--color-text-primary)">{destination.visaInfo.description}</p>
+                <p className="text-xs text-(--color-text-muted)">
+                  تێبینی: یاساکانی ڤیزا گۆڕان دەکەن. تکایە پێش گەشت لەگەڵ ئەژانسەکە یان کۆنسولخانەی وڵاتی مەبەست دڵنیابەرەوە.
+                </p>
+              </div>
+            </section>
+          )}
+
+          {/* Currency & language (international only) */}
+          {destination.scope === "international" && destination.currencyInfo && (
+            <section>
+              <h2 className="mb-3 text-xl font-extrabold text-(--color-text-primary)">دراو و زمان</h2>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="rounded-(--radius-lg) bg-(--color-surface-elevated) p-5">
+                  <p className="text-xs font-semibold text-(--color-text-muted)">دراوی ناوخۆیی</p>
+                  <p className="mt-1 font-bold text-(--color-text-primary)">
+                    {destination.currencyInfo.name} ({destination.currencyInfo.symbol})
+                  </p>
+                  <p className="mt-1 text-sm text-(--color-text-secondary)">{destination.currencyInfo.exchangeNote}</p>
+                </div>
+                <div className="rounded-(--radius-lg) bg-(--color-surface-elevated) p-5">
+                  <p className="text-xs font-semibold text-(--color-text-muted)">زمانی خۆجێیی</p>
+                  <p className="mt-1 font-bold text-(--color-text-primary)">{destination.spokenLanguages?.join("، ")}</p>
+                </div>
+              </div>
+            </section>
+          )}
+
           {/* Popular trips */}
           <section id="trips">
             <div className="mb-4 flex items-center justify-between">
@@ -186,7 +229,7 @@ export default function DestinationDetailPage() {
           <h3 className="mb-3 font-bold text-(--color-text-primary)">کورتەی {destination.name}</h3>
           <dl className="flex flex-col gap-3 text-sm">
             <div className="flex items-center justify-between">
-              <dt className="text-(--color-text-muted)">پارێزگا</dt>
+              <dt className="text-(--color-text-muted)">{destination.scope === "international" ? "وڵات" : "پارێزگا"}</dt>
               <dd className="font-semibold text-(--color-text-primary)">{destination.governorate}</dd>
             </div>
             <div className="flex items-center justify-between">

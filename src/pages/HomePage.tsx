@@ -16,10 +16,13 @@ const CATEGORIES: TripCategory[] = ["nature", "adventure", "family", "romantic",
 
 export default function HomePage() {
   const [category, setCategory] = useState<TripCategory | null>(null);
-  const featuredDestinations = DESTINATIONS.filter((d) => d.featured);
+  const domesticDestinations = DESTINATIONS.filter((d) => d.scope === "domestic");
+  const internationalDestinations = DESTINATIONS.filter((d) => d.scope === "international");
+  const internationalTrips = TRIPS.filter((t) => t.scope === "international");
+  const featuredDestinations = domesticDestinations.filter((d) => d.featured);
   const trending = [...TRIPS].sort((a, b) => b.reviewCount - a.reviewCount).slice(0, 4);
-  const weekend = TRIPS.filter((t) => t.duration <= 2).slice(0, 4);
-  const hiddenGems = DESTINATIONS.filter((d) => !d.featured);
+  const weekend = TRIPS.filter((t) => t.scope === "domestic" && t.duration <= 2).slice(0, 4);
+  const hiddenGems = domesticDestinations.filter((d) => !d.featured);
   const topAgencies = [...AGENCIES].sort((a, b) => b.rating - a.rating).slice(0, 3);
   const filteredTrips = category ? TRIPS.filter((t) => t.category === category) : TRIPS;
 
@@ -82,7 +85,7 @@ export default function HomePage() {
       {/* Popular destinations */}
       <Section title="شوێنە بەناوبانگەکان" subtitle="هەرێمە جوانەکانی کوردستان بناسە">
         <div className="flex gap-6 overflow-x-auto scrollbar-none pb-2">
-          {DESTINATIONS.map((d) => (
+          {domesticDestinations.map((d) => (
             <DestinationChip key={d.id} destination={d} />
           ))}
         </div>
@@ -143,8 +146,27 @@ export default function HomePage() {
         </div>
       </Section>
 
+      {/* International trips */}
+      <Section title="گەشتی دەرەوەی وڵات" subtitle="جیهان لەگەڵ زاگرۆس بناسە — لە ئیستانبوڵ هەتا دوبەی و قاهیرە" tone="elevated">
+        <div className="mb-6 flex gap-4 overflow-x-auto scrollbar-none pb-2">
+          {internationalDestinations.map((d) => (
+            <DestinationChip key={d.id} destination={d} />
+          ))}
+        </div>
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {internationalTrips.map((trip) => (
+            <TripCard key={trip.id} trip={trip} />
+          ))}
+        </div>
+        <div className="mt-6 text-center">
+          <Link to="/explore?scope=international" className={buttonClassName("outline", "md")}>
+            هەموو گەشتەکانی دەرەوەی وڵات ببینە
+          </Link>
+        </div>
+      </Section>
+
       {/* Top agencies */}
-      <Section title="باشترین ئەژانسەکان" subtitle="ئەژانسە پشتڕاستکراوەکانی کوردستان" tone="elevated">
+      <Section title="باشترین ئەژانسەکان" subtitle="ئەژانسە پشتڕاستکراوەکانی کوردستان">
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {topAgencies.map((a) => (
             <AgencyCard key={a.id} agency={a} />

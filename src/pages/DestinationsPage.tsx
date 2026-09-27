@@ -6,14 +6,18 @@ import { Rating } from "@/components/ui/Rating";
 import { EmptyState } from "@/components/ui/States";
 import { DestinationCard } from "@/components/cards/DestinationCard";
 import { MapPinIcon, SearchIcon } from "@/components/icons";
-import { DESTINATIONS, GOVERNORATES, getTripsByDestination } from "@/data/mock";
+import { COUNTRIES, DESTINATIONS, GOVERNORATES, getTripsByDestination } from "@/data/mock";
 import { cn } from "@/lib/utils";
+import { TRAVEL_SCOPE_LABELS, type TravelScope } from "@/types";
 
 type ViewMode = "grid" | "list" | "map";
+type ScopeFilter = "all" | TravelScope;
+const SCOPE_OPTIONS: ScopeFilter[] = ["all", "domestic", "international"];
 const ACTIVITY_OPTIONS = Array.from(new Set(DESTINATIONS.flatMap((d) => d.activities)));
 
 export default function DestinationsPage() {
   const [query, setQuery] = useState("");
+  const [scope, setScope] = useState<ScopeFilter>("all");
   const [governorate, setGovernorate] = useState("all");
   const [activities, setActivities] = useState<string[]>([]);
   const [minRating, setMinRating] = useState(0);
@@ -22,12 +26,13 @@ export default function DestinationsPage() {
   const results = useMemo(() => {
     return DESTINATIONS.filter((d) => {
       if (query && !(`${d.name} ${d.tagline}`.toLowerCase().includes(query.toLowerCase()))) return false;
+      if (scope !== "all" && d.scope !== scope) return false;
       if (governorate !== "all" && d.governorate !== governorate) return false;
       if (activities.length && !activities.every((a) => d.activities.includes(a))) return false;
       if (d.rating < minRating) return false;
       return true;
     });
-  }, [query, governorate, activities, minRating]);
+  }, [query, scope, governorate, activities, minRating]);
 
   function toggleActivity(a: string) {
     setActivities((prev) => (prev.includes(a) ? prev.filter((x) => x !== a) : [...prev, a]));
@@ -35,6 +40,7 @@ export default function DestinationsPage() {
 
   function resetFilters() {
     setQuery("");
+    setScope("all");
     setGovernorate("all");
     setActivities([]);
     setMinRating(0);
@@ -44,7 +50,22 @@ export default function DestinationsPage() {
     <div className="mx-auto max-w-(--breakpoint-2xl) px-4 py-8 sm:px-6 lg:py-10">
       <div className="mb-6 flex flex-col gap-1.5">
         <h1 className="text-2xl font-extrabold text-(--color-text-primary) sm:text-3xl">شوێنە گەشتیارییەکان</h1>
-        <p className="text-(--color-text-secondary)">هەرێمە جیاوازەکانی کوردستان بدۆزەرەوە، هەریەکە بە تایبەتمەندی خۆیەوە.</p>
+        <p className="text-(--color-text-secondary)">هەرێمەکانی کوردستان و شوێنی دەرەوەی وڵات بدۆزەرەوە، هەریەکە بە تایبەتمەندی خۆیەوە.</p>
+      </div>
+
+      <div className="mb-6 flex flex-wrap gap-2">
+        {SCOPE_OPTIONS.map((s) => (
+          <Chip
+            key={s}
+            selected={scope === s}
+            onClick={() => {
+              setScope(s);
+              setGovernorate("all");
+            }}
+          >
+            {s === "all" ? "هەموو شوێنەکان" : TRAVEL_SCOPE_LABELS[s]}
+          </Chip>
+        ))}
       </div>
 
       <div className="mb-6 flex flex-col gap-4 rounded-(--radius-lg) border border-(--color-border) bg-(--color-surface) p-4">
@@ -60,8 +81,8 @@ export default function DestinationsPage() {
           </div>
           <div className="w-full sm:w-48">
             <Select value={governorate} onChange={(e) => setGovernorate(e.target.value)}>
-              <option value="all">هەموو پارێزگاکان</option>
-              {GOVERNORATES.map((g) => (
+              <option value="all">{scope === "international" ? "هەموو وڵاتان" : "هەموو پارێزگاکان"}</option>
+              {(scope === "international" ? COUNTRIES : GOVERNORATES).map((g) => (
                 <option key={g.id} value={g.name}>
                   {g.name}
                 </option>
