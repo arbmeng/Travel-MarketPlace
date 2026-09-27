@@ -1,0 +1,150 @@
+@import "tailwindcss";
+
+@theme {
+  /* ---- Typography ---- */
+  --font-kurdish: "Noto Kufi Arabic", "Segoe UI", sans-serif;
+  --font-latin: "Manrope", "Segoe UI", sans-serif;
+
+  /* ---- Brand color system: Zagros ---- */
+  /* Primary — alpine valley teal */
+  --color-primary-dark: #082A2B;
+  --color-primary: #0F3D3E;
+  --color-primary-light: #3F8F82;
+  --color-primary-50: #EAF3F1;
+  --color-primary-100: #D2E5E1;
+
+  /* Secondary — sun-baked clay/terracotta (villages, architecture) */
+  --color-secondary-dark: #8C4A22;
+  --color-secondary: #B5652F;
+  --color-secondary-light: #D69466;
+
+  /* Accent — amber sunset over the mountains */
+  --color-accent-dark: #A8791E;
+  --color-accent: #D9A441;
+  --color-accent-light: #EBC77E;
+
+  /* Neutrals / surfaces — warm paper tone, editorial */
+  --color-bg: #FBF9F4;
+  --color-bg-dark: #0D1210;
+  --color-surface: #FFFFFF;
+  --color-surface-dark: #16201D;
+  --color-surface-elevated: #F4EFE4;
+  --color-surface-elevated-dark: #1E2A26;
+
+  /* Text */
+  --color-text-primary: #16201D;
+  --color-text-primary-dark: #F4F2EC;
+  --color-text-secondary: #4B5A56;
+  --color-text-secondary-dark: #B7C2BC;
+  --color-text-muted: #8A948E;
+  --color-text-muted-dark: #718079;
+
+  /* Border */
+  --color-border: #E5E0D3;
+  --color-border-dark: #2B3733;
+
+  /* Semantic */
+  --color-success: #2E7D5B;
+  --color-success-bg: #E7F4EC;
+  --color-warning: #B5791E;
+  --color-warning-bg: #FBF0DD;
+  --color-error: #B23B2E;
+  --color-error-bg: #FBEAE7;
+  --color-info: #2A6F9E;
+  --color-info-bg: #E9F2F9;
+
+  /* ---- Radius ---- */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 28px;
+  --radius-pill: 999px;
+
+  /* ---- Shadows ---- */
+  --shadow-subtle: 0 1px 2px rgba(15, 20, 18, 0.06), 0 1px 1px rgba(15, 20, 18, 0.04);
+  --shadow-medium: 0 4px 12px rgba(15, 20, 18, 0.08), 0 2px 4px rgba(15, 20, 18, 0.05);
+  --shadow-elevated: 0 12px 28px rgba(15, 20, 18, 0.12), 0 4px 10px rgba(15, 20, 18, 0.06);
+  --shadow-floating: 0 24px 60px rgba(15, 20, 18, 0.18), 0 8px 20px rgba(15, 20, 18, 0.08);
+
+  /* container widths per spec grid */
+  --breakpoint-xs: 390px;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1440px;
+  --breakpoint-3xl: 1920px;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-kurdish);
+  }
+
+  body {
+    @apply bg-(--color-bg) text-(--color-text-primary) antialiased;
+    font-feature-settings: "tnum" 1;
+  }
+
+  ::selection {
+    background: var(--color-accent-light);
+    color: var(--color-primary-dark);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Latin/number runs inside Kurdish text should read in the UI font for tabular figures */
+  .num {
+    font-family: var(--font-latin);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@layer utilities {
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
