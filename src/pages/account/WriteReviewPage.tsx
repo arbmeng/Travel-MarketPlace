@@ -137,7 +137,7 @@ export default function WriteReviewPage() {
   );
 }
 
-function StarPicker({ value, onChange, size = "md" }: { value: number; onChange: (v: number) => void; size?: "sm" | "lg" }) {
+function StarPicker({ value, onChange, size = "sm" }: { value: number; onChange: (v: number) => void; size?: "sm" | "lg" }) {
   const starSize = size === "lg" ? "size-9" : "size-6";
   return (
     <div className="flex items-center gap-1">
