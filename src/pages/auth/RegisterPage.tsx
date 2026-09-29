@@ -1,8 +1,102 @@
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { AuthLayout } from "@/components/layout/AuthLayout";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+
 export default function RegisterPage() {
+  const navigate = useNavigate();
+  const [form, setForm] = useState({ fullName: "", email: "", phone: "", password: "" });
+  const [agreed, setAgreed] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const canSubmit = form.fullName.trim() && (form.email.trim() || form.phone.trim()) && form.password.trim() && agreed;
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!canSubmit) return;
+    navigate("/onboarding");
+  }
+
   return (
-    <div className="mx-auto max-w-(--breakpoint-2xl) px-4 py-16 sm:px-6">
-      <h1 className="text-2xl font-bold text-(--color-text-primary)">خۆتۆمارکردن</h1>
-      <p className="mt-2 text-(--color-text-secondary)">ئەم پەڕەیە لەژێر گەشەپێدانایە.</p>
-    </div>
+    <AuthLayout
+      title="هەژمار درووستبکە"
+      subtitle="خۆت تۆمار بکە و دەستپێبکە بە دۆزینەوەی گەشت لە کوردستان و جیهان."
+      footer={
+        <span className="text-(--color-text-secondary)">
+          هەژمارت هەیە؟{" "}
+          <Link to="/login" className="font-semibold text-(--color-primary) hover:underline">
+            بچۆرەژوورەوە
+          </Link>
+        </span>
+      }
+    >
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <Input
+          label="ناوی تەواو"
+          required
+          value={form.fullName}
+          onChange={(e) => setForm({ ...form, fullName: e.target.value })}
+          placeholder="بۆ نموونە: ئاراس عەبدوڵا"
+        />
+        <Input
+          label="ئیمەیل"
+          type="email"
+          autoComplete="email"
+          required={!form.phone.trim()}
+          value={form.email}
+          onChange={(e) => setForm({ ...form, email: e.target.value })}
+          placeholder="name@example.com"
+        />
+        <Input
+          label="ژمارەی مۆبایل"
+          hint="ئیمەیل یان مۆبایل، بەلایەنی کەم یەکێکیان پێویستە"
+          type="tel"
+          autoComplete="tel"
+          required={!form.email.trim()}
+          value={form.phone}
+          onChange={(e) => setForm({ ...form, phone: e.target.value })}
+          placeholder="+964 7XX XXX XXXX"
+        />
+        <div className="relative">
+          <Input
+            label="وشەی نهێنی"
+            required
+            minLength={8}
+            autoComplete="new-password"
+            type={showPassword ? "text" : "password"}
+            className="pe-20"
+            value={form.password}
+            onChange={(e) => setForm({ ...form, password: e.target.value })}
+            hint="بەلایەنی کەم ٨ پیت"
+          />
+          <button type="button" onClick={() => setShowPassword((visible) => !visible)} aria-pressed={showPassword} className="absolute end-3 top-[38px] rounded px-2 py-1 text-xs font-semibold text-(--color-text-muted) hover:text-(--color-primary)">
+            {showPassword ? "شاردن" : "پیشاندان"}
+          </button>
+        </div>
+        <label className="flex items-start gap-2.5 text-sm text-(--color-text-primary) cursor-pointer">
+          <input
+            type="checkbox"
+            checked={agreed}
+            onChange={(e) => setAgreed(e.target.checked)}
+            required
+            className="mt-0.5 size-5 shrink-0 rounded-(--radius-xs) border-(--color-border) text-(--color-primary) focus:ring-(--color-primary)"
+          />
+          <span>
+            ڕازیم بە{" "}
+            <Link to="/legal/terms" className="font-semibold text-(--color-primary) hover:underline">
+              مەرجەکانی خزمەتگوزاری
+            </Link>{" "}
+            و{" "}
+            <Link to="/legal/privacy" className="font-semibold text-(--color-primary) hover:underline">
+              سیاسەتی تایبەتمەندی
+            </Link>
+          </span>
+        </label>
+        <Button type="submit" fullWidth>
+          خۆتۆمارکردن
+        </Button>
+      </form>
+    </AuthLayout>
   );
 }

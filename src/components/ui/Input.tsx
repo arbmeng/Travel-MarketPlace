@@ -34,6 +34,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
       <input
         ref={ref}
         id={fieldId}
+        required={required}
         className={cn(
           "h-12 w-full rounded-(--radius-md) border bg-(--color-surface) px-4 text-[15px] text-(--color-text-primary) placeholder:text-(--color-text-muted) transition-colors",
           error ? "border-(--color-error)" : "border-(--color-border) focus:border-(--color-primary)",
@@ -65,6 +66,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
       <textarea
         ref={ref}
         id={fieldId}
+        required={required}
         className={cn(
           "min-h-28 w-full rounded-(--radius-md) border bg-(--color-surface) px-4 py-3 text-[15px] text-(--color-text-primary) placeholder:text-(--color-text-muted) transition-colors",
           error ? "border-(--color-error)" : "border-(--color-border) focus:border-(--color-primary)",

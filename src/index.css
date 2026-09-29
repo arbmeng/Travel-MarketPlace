@@ -1,30 +1,28 @@
 @import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
 
 @theme {
   /* ---- Typography ---- */
   --font-kurdish: "Noto Kufi Arabic", "Segoe UI", sans-serif;
   --font-latin: "Manrope", "Segoe UI", sans-serif;
 
-  /* ---- Brand color system: Zagros ---- */
-  /* Primary — alpine valley teal */
-  --color-primary-dark: #082A2B;
-  --color-primary: #0F3D3E;
-  --color-primary-light: #3F8F82;
-  --color-primary-50: #EAF3F1;
-  --color-primary-100: #D2E5E1;
+  /* ---- Zerrin.Travel brand colors ---- */
+  --color-primary-dark: #081C16;
+  --color-primary: #123252;
+  --color-primary-light: #527C68;
+  --color-primary-50: #EDF2EE;
+  --color-primary-100: #DCE7E0;
 
-  /* Secondary — sun-baked clay/terracotta (villages, architecture) */
-  --color-secondary-dark: #8C4A22;
-  --color-secondary: #B5652F;
-  --color-secondary-light: #D69466;
+  --color-secondary-dark: #8D6B16;
+  --color-secondary: #B18A24;
+  --color-secondary-light: #D7B65A;
 
-  /* Accent — amber sunset over the mountains */
-  --color-accent-dark: #A8791E;
-  --color-accent: #D9A441;
-  --color-accent-light: #EBC77E;
+  --color-accent-dark: #98751D;
+  --color-accent: #C9A227;
+  --color-accent-light: #E8D79C;
 
-  /* Neutrals / surfaces — warm paper tone, editorial */
-  --color-bg: #FBF9F4;
+  /* Neutrals / surfaces */
+  --color-bg: #FFFFFF;
   --color-bg-dark: #0D1210;
   --color-surface: #FFFFFF;
   --color-surface-dark: #16201D;
@@ -116,6 +114,64 @@
   .text-balance {
     text-wrap: balance;
   }
+}
+
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  color: var(--color-text-primary);
+  font-family: var(--font-kurdish);
+}
+
+.zerrin-marker-host {
+  border: 0;
+  background: transparent;
+}
+
+.zerrin-marker {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: var(--color-primary-dark);
+  box-shadow: 0 4px 12px rgb(8 28 22 / 30%);
+  transition: transform 160ms ease, background-color 160ms ease;
+}
+
+.zerrin-marker:hover,
+.zerrin-marker.is-selected {
+  transform: scale(1.12);
+  background: var(--color-accent);
+}
+
+.zerrin-marker span {
+  width: 10px;
+  height: 10px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: var(--color-accent);
+}
+
+.zerrin-marker.is-selected span {
+  background: var(--color-primary-dark);
+}
+
+.leaflet-tooltip {
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text-primary);
+  font-family: var(--font-kurdish);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.leaflet-control-zoom {
+  overflow: hidden;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgb(8 28 22 / 16%) !important;
 }
 
 @keyframes modal-in {

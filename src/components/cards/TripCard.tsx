@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Rating } from "@/components/ui/Rating";
 import { SaveButton } from "@/components/ui/SaveButton";
 import { Badge, VerifiedBadge } from "@/components/ui/Badge";
+import { GlobeIcon } from "@/components/icons";
 import { formatFromPrice } from "@/lib/format";
 import { DIFFICULTY_LABELS, TRIP_CATEGORY_LABELS, type Trip } from "@/types";
 import { getAgencyById, getDestinationById } from "@/data/mock";
@@ -27,9 +28,21 @@ export function TripCard({ trip, className }: { trip: Trip; className?: string }
           className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
         <div className="absolute inset-x-0 top-0 flex items-start justify-between p-3">
-          <Badge tone="neutral" className="bg-white/90 backdrop-blur">
-            {TRIP_CATEGORY_LABELS[trip.category]}
-          </Badge>
+          <div className="flex flex-wrap gap-1.5">
+            <Badge tone="neutral" className="bg-white/90 backdrop-blur">
+              {TRIP_CATEGORY_LABELS[trip.category]}
+            </Badge>
+            {trip.scope === "international" && (
+              <Badge tone="info" icon={<GlobeIcon className="size-3.5" />} className="bg-white/90 backdrop-blur">
+                دەرەوەی وڵات
+              </Badge>
+            )}
+            {trip.sponsored && (
+              <Badge tone="accent" className="bg-white/95 backdrop-blur">
+                سپۆنسەرکراو
+              </Badge>
+            )}
+          </div>
           <SaveButton id={trip.id} />
         </div>
         {trip.spotsRemaining <= 5 && (
@@ -45,7 +58,10 @@ export function TripCard({ trip, className }: { trip: Trip; className?: string }
           <h3 className="line-clamp-1 text-[15px] font-bold text-(--color-text-primary)">{trip.title}</h3>
           <Rating value={trip.rating} size="sm" />
         </div>
-        <p className="text-sm text-(--color-text-secondary)">{destination?.name}</p>
+        <p className="text-sm text-(--color-text-secondary)">
+          {destination?.name}
+          {destination && <span className="text-(--color-text-muted)"> · {destination.governorate}</span>}
+        </p>
         {agency && (
           <div className="flex items-center gap-1.5 text-xs text-(--color-text-muted)">
             <span>{agency.name}</span>

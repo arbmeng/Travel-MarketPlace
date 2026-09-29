@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { Logo } from "@/components/layout/Logo";
-import { BellIcon, HeartIcon, MenuIcon, MessageIcon, SearchIcon, UserIcon } from "@/components/icons";
+import { BellIcon, HeartIcon, MessageIcon, SearchIcon, UserIcon } from "@/components/icons";
 import { NOTIFICATIONS } from "@/data/mock";
 import { cn } from "@/lib/utils";
 
@@ -15,7 +15,6 @@ const NAV_LINKS = [
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
   const unreadCount = NOTIFICATIONS.filter((n) => !n.read).length;
 
   useEffect(() => {
@@ -27,11 +26,11 @@ export function Header() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-40 w-full border-b bg-(--color-surface)/95 backdrop-blur transition-all",
+        "sticky top-0 z-40 w-full border-b bg-(--color-surface)/95 backdrop-blur transition-[box-shadow,border-color]",
         scrolled ? "border-(--color-border) shadow-(--shadow-subtle)" : "border-transparent"
       )}
     >
-      <div className={cn("mx-auto flex max-w-(--breakpoint-2xl) items-center justify-between gap-4 px-4 transition-all sm:px-6", scrolled ? "h-16" : "h-20")}>
+      <div className="mx-auto flex h-16 max-w-(--breakpoint-2xl) items-center justify-between gap-4 px-4 sm:h-[72px] sm:px-6">
         <Logo />
 
         <nav className="hidden items-center gap-1 lg:flex">
@@ -81,48 +80,15 @@ export function Header() {
           </Link>
           <Link
             to="/account"
-            className="flex items-center gap-2 rounded-(--radius-pill) border border-(--color-border) py-1 pe-3 ps-1 hover:shadow-(--shadow-subtle)"
+            className="hidden items-center gap-2 rounded-(--radius-pill) border border-(--color-border) py-1 pe-3 ps-1 hover:shadow-(--shadow-subtle) lg:flex"
           >
             <span className="flex size-8 items-center justify-center rounded-full bg-(--color-primary-50) text-(--color-primary-dark)">
               <UserIcon className="size-4" />
             </span>
             <span className="hidden text-sm font-semibold text-(--color-text-primary) md:inline">هەژمار</span>
           </Link>
-          <button
-            type="button"
-            className="flex size-10 items-center justify-center rounded-full text-(--color-text-secondary) hover:bg-(--color-surface-elevated) lg:hidden"
-            onClick={() => setMobileOpen((v) => !v)}
-            aria-label="مێنیو"
-          >
-            <MenuIcon className="size-5" />
-          </button>
         </div>
       </div>
-
-      {mobileOpen && (
-        <div className="border-t border-(--color-border) bg-(--color-surface) px-4 py-3 lg:hidden">
-          <nav className="flex flex-col gap-1">
-            {NAV_LINKS.map((link) => (
-              <NavLink
-                key={link.to}
-                to={link.to}
-                onClick={() => setMobileOpen(false)}
-                className={({ isActive }) =>
-                  cn("rounded-(--radius-md) px-3 py-2.5 text-sm font-semibold", isActive ? "bg-(--color-primary-50) text-(--color-primary-dark)" : "text-(--color-text-secondary)")
-                }
-              >
-                {link.label}
-              </NavLink>
-            ))}
-            <div className="mt-2 border-t border-(--color-border) pt-2">
-              <CurrencyLanguageSwitcher />
-            </div>
-            <Link to="/agency/login" onClick={() => setMobileOpen(false)} className="mt-2 rounded-(--radius-md) px-3 py-2.5 text-sm font-semibold text-(--color-secondary)">
-              بۆ ئەژانسەکان
-            </Link>
-          </nav>
-        </div>
-      )}
     </header>
   );
 }
