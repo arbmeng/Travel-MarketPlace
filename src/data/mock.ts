@@ -391,6 +391,8 @@ function makeItinerary(location: string, days: number): Trip["itinerary"] {
 const TRIP_SEEDS: (Omit<Trip, "id" | "slug"> & { slugBase: string })[] = [
   {
     slugBase: "hawraman-trip",
+    featured: true,
+    sponsored: true,
     title: "گەشتی هەورامان",
     destinationId: "d1",
     agencyId: "a2",
@@ -427,6 +429,7 @@ const TRIP_SEEDS: (Omit<Trip, "id" | "slug"> & { slugBase: string })[] = [
   },
   {
     slugBase: "dukan-nature-day",
+    featured: true,
     title: "ڕۆژی سروشتی دوکان",
     destinationId: "d2",
     agencyId: "a3",
@@ -462,6 +465,8 @@ const TRIP_SEEDS: (Omit<Trip, "id" | "slug"> & { slugBase: string })[] = [
   },
   {
     slugBase: "rawanduz-adventure",
+    featured: true,
+    sponsored: true,
     title: "ماجەڕای ڕەواندز",
     destinationId: "d3",
     agencyId: "a1",
@@ -497,6 +502,7 @@ const TRIP_SEEDS: (Omit<Trip, "id" | "slug"> & { slugBase: string })[] = [
   },
   {
     slugBase: "chomani-camping",
+    featured: true,
     title: "کەمپینگی چۆمان",
     destinationId: "d5",
     agencyId: "a1",
@@ -600,6 +606,7 @@ const TRIP_SEEDS: (Omit<Trip, "id" | "slug"> & { slugBase: string })[] = [
   },
   {
     slugBase: "istanbul-city-break",
+    sponsored: true,
     title: "گەشتی ئیستانبوڵ",
     destinationId: "d9",
     agencyId: "a5",

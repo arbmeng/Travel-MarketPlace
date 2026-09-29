@@ -26,7 +26,7 @@ export default function AgencyCustomerDetailPage() {
         <div className="flex-1">
           <h1 className="text-xl font-extrabold text-(--color-text-primary)">{customer.name}</h1>
           <p className="mt-1 text-sm text-(--color-text-muted)">{customer.phone} · {customer.email}</p>
-          <p className="mt-1 text-xs text-(--color-text-muted)">لایەنگری زاگرۆس بەرواری {customer.joinedAt}</p>
+          <p className="mt-1 text-xs text-(--color-text-muted)">ئەندامی Zerrin.Travel لە {customer.joinedAt}</p>
         </div>
         <a href={`tel:${customer.phone}`} className={buttonClassName("outline", "md", { className: "gap-2" })}>
           <MessageIcon className="size-4" /> پەیوەندیکردن

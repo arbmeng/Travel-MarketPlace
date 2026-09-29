@@ -21,7 +21,7 @@ export default function AgencySupportPage() {
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-2xl font-extrabold text-(--color-text-primary)">پشتگیری</h1>
-        <p className="mt-1 text-(--color-text-secondary)">پرسیارێکت هەیە؟ تیمی پشتگیری زاگرۆس یارمەتیت دەدات.</p>
+        <p className="mt-1 text-(--color-text-secondary)">پرسیارێکت هەیە؟ تیمی پشتگیری Zerrin.Travel یارمەتیت دەدات.</p>
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">

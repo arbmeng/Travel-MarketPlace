@@ -1,4 +1,5 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { useEffect } from "react";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import { Layout, BareLayout } from "@/components/layout/Layout";
 import { AgencyLayout } from "@/components/layout/AgencyLayout";
 
@@ -66,6 +67,7 @@ function NotFoundPage() {
 function App() {
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL}>
+      <ScrollToTop />
       <Routes>
         <Route element={<Layout />}>
           <Route index element={<HomePage />} />
@@ -132,6 +134,16 @@ function App() {
       </Routes>
     </BrowserRouter>
   );
+}
+
+function ScrollToTop() {
+  const { pathname, search } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname, search]);
+
+  return null;
 }
 
 export default App;

@@ -37,6 +37,11 @@ export function TripCard({ trip, className }: { trip: Trip; className?: string }
                 دەرەوەی وڵات
               </Badge>
             )}
+            {trip.sponsored && (
+              <Badge tone="accent" className="bg-white/95 backdrop-blur">
+                سپۆنسەرکراو
+              </Badge>
+            )}
           </div>
           <SaveButton id={trip.id} />
         </div>

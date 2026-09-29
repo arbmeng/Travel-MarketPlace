@@ -45,7 +45,7 @@ export function Footer() {
         <div className="flex flex-col gap-4">
           <Logo />
           <p className="max-w-xs text-sm text-(--color-text-secondary)">
-            زاگرۆس، بازاڕی گەشتی کوردستان — دۆزینەوە، گەڕان و حیجزکردنی گەشت و ئەزموونی ڕەسەن لە کوردستان.
+            Zerrin.Travel — دۆزینەوە و حیجزکردنی گەشت و ئەزموون لە کوردستان و جیهان.
           </p>
           <div className="flex items-center gap-3 pt-1 text-(--color-text-muted)">
             {["Instagram", "Facebook", "TikTok", "YouTube"].map((s) => (
@@ -68,7 +68,7 @@ export function Footer() {
       </div>
       <div className="border-t border-(--color-border)">
         <div className="mx-auto flex max-w-(--breakpoint-2xl) flex-col items-center justify-between gap-3 px-4 py-5 text-xs text-(--color-text-muted) sm:flex-row sm:px-6">
-          <span>© {new Date().getFullYear()} زاگرۆس. هەموو مافەکان پارێزراون.</span>
+          <span>© {new Date().getFullYear()} Zerrin.Travel. هەموو مافەکان پارێزراون.</span>
           <div className="flex items-center gap-4">
             <span>کوردی</span>
             <span>IQD (د.ع)</span>

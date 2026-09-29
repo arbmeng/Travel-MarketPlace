@@ -209,6 +209,8 @@ export interface Trip {
   whatToBring: string[];
   familyFriendly?: boolean;
   privateAvailable?: boolean;
+  featured?: boolean;
+  sponsored?: boolean;
   scope: TravelScope;
   flightInfo?: FlightInfo;
 }

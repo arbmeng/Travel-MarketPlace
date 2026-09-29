@@ -1,35 +1,38 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { divIcon } from "leaflet";
+import { MapContainer, Marker, TileLayer, Tooltip, ZoomControl, useMap } from "react-leaflet";
 import { Rating } from "@/components/ui/Rating";
 import { BottomSheet } from "@/components/ui/Modal";
-import { MapPinIcon } from "@/components/icons";
+import { MapPinIcon, SearchIcon, XCircleIcon } from "@/components/icons";
 import { DESTINATIONS, getTripsByDestination } from "@/data/mock";
 import { cn } from "@/lib/utils";
 import type { Destination } from "@/types";
 
-// Geographic bounding box comfortably containing every destination's lat/lng in mock.ts
-// (observed range: lat ≈ 35.2–37.14, lng ≈ 42.68–46.05). This is the ONLY place that knows
-// about geographic projection — swapping in a real map SDK (Mapbox/Google Maps) later only
-// means replacing `projectLatLng` and the static backdrop below with the SDK's own layer;
-// everything else (marker list, selection, popovers) can stay as-is.
-const MAP_BOUNDS = { minLat: 35, maxLat: 37.2, minLng: 42.5, maxLng: 46.2 };
+const KURDISTAN_CENTER: [number, number] = [36.2, 44.1];
 
-function clamp(n: number, min: number, max: number) {
-  return Math.min(max, Math.max(min, n));
-}
-
-function projectLatLng(lat: number, lng: number) {
-  const top = ((MAP_BOUNDS.maxLat - lat) / (MAP_BOUNDS.maxLat - MAP_BOUNDS.minLat)) * 100;
-  const left = ((lng - MAP_BOUNDS.minLng) / (MAP_BOUNDS.maxLng - MAP_BOUNDS.minLng)) * 100;
-  return { top: clamp(top, 4, 94), left: clamp(left, 4, 94) };
+function destinationIcon(selected: boolean) {
+  return divIcon({
+    className: "zerrin-marker-host",
+    html: `<span class="zerrin-marker${selected ? " is-selected" : ""}"><span></span></span>`,
+    iconSize: [44, 44],
+    iconAnchor: [22, 22],
+  });
 }
 
 export default function MapExplorerPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
-  const listRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const [query, setQuery] = useState("");
+  const listRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
   const selected = useMemo(() => DESTINATIONS.find((d) => d.id === selectedId) ?? null, [selectedId]);
+  const visibleDestinations = useMemo(() => {
+    const normalizedQuery = query.trim().toLocaleLowerCase();
+    return normalizedQuery
+      ? DESTINATIONS.filter((d) => `${d.name} ${d.governorate} ${d.tagline}`.toLocaleLowerCase().includes(normalizedQuery))
+      : DESTINATIONS;
+  }, [query]);
 
   function selectDestination(d: Destination) {
     setSelectedId(d.id);
@@ -39,83 +42,89 @@ export default function MapExplorerPage() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-5rem)] flex-col lg:flex-row">
-      {/* Map canvas */}
-      <div className="relative flex-1 overflow-hidden bg-gradient-to-br from-(--color-primary-50) via-(--color-surface-elevated) to-(--color-accent-light)/30">
-        <div
-          className="absolute inset-0 opacity-50"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle at 15% 25%, var(--color-primary-light) 0, transparent 30%), radial-gradient(circle at 60% 15%, var(--color-secondary-light) 0, transparent 28%), radial-gradient(circle at 80% 70%, var(--color-accent) 0, transparent 32%), radial-gradient(circle at 30% 80%, var(--color-primary) 0, transparent 25%)",
-          }}
-        />
-        <div className="absolute inset-0 [background-image:linear-gradient(var(--color-border)_1px,transparent_1px),linear-gradient(90deg,var(--color-border)_1px,transparent_1px)] [background-size:40px_40px] opacity-30" />
-
-        {DESTINATIONS.map((d) => {
-          const { top, left } = projectLatLng(d.lat, d.lng);
-          const isSelected = selectedId === d.id;
-          return (
-            <button
-              key={d.id}
-              type="button"
-              onClick={() => selectDestination(d)}
-              style={{ top: `${top}%`, left: `${left}%` }}
-              className={cn(
-                "absolute -translate-x-1/2 -translate-y-full transition-transform",
-                isSelected ? "z-20 scale-125" : "z-10 hover:scale-110"
-              )}
-              aria-label={d.name}
+    <div className="flex h-[calc(100dvh-8rem)] min-h-[420px] flex-col lg:h-[calc(100dvh-4.5rem)] lg:flex-row">
+      <div className="relative min-h-0 flex-1 overflow-hidden bg-(--color-surface-elevated)">
+        <MapContainer center={KURDISTAN_CENTER} zoom={7} minZoom={5} maxZoom={17} scrollWheelZoom zoomControl={false} className="size-full">
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+            url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+            subdomains="abcd"
+          />
+          <ZoomControl position="bottomleft" />
+          <MapFollowSelection destination={selected} />
+          {visibleDestinations.map((destination) => (
+            <Marker
+              key={destination.id}
+              position={[destination.lat, destination.lng]}
+              title={destination.name}
+              icon={destinationIcon(selectedId === destination.id)}
+              eventHandlers={{ click: () => selectDestination(destination) }}
             >
-              <span
-                className={cn(
-                  "flex size-9 items-center justify-center rounded-full border-2 border-white shadow-(--shadow-elevated)",
-                  isSelected ? "bg-(--color-secondary)" : "bg-(--color-primary)"
-                )}
-              >
-                <MapPinIcon className="size-4 text-white" />
-              </span>
-              <span
-                className={cn(
-                  "mx-auto mt-1 block w-max max-w-28 truncate rounded-(--radius-pill) bg-(--color-surface)/95 px-2 py-0.5 text-[11px] font-semibold text-(--color-text-primary) shadow-(--shadow-subtle)",
-                  isSelected ? "opacity-100" : "opacity-0 lg:opacity-100"
-                )}
-              >
-                {d.name}
-              </span>
-            </button>
-          );
-        })}
+              <Tooltip direction="top" offset={[0, -16]}>{destination.name}</Tooltip>
+            </Marker>
+          ))}
+        </MapContainer>
 
-        {/* Desktop popover for selected marker */}
+        <div className="absolute start-4 top-4 z-[1000] w-[min(22rem,calc(100%-2rem))]">
+          <label className="relative block">
+            <SearchIcon className="pointer-events-none absolute start-3.5 top-1/2 size-4 -translate-y-1/2 text-(--color-text-muted)" />
+            <input
+              aria-label="گەڕان بۆ شوێن لەسەر نەخشە"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="گەڕان بۆ شوێن یان پارێزگا..."
+              className="h-12 w-full rounded-[8px] border border-(--color-border) bg-white/95 ps-10 pe-10 text-sm text-(--color-text-primary) shadow-(--shadow-elevated) outline-none backdrop-blur placeholder:text-(--color-text-muted) focus:border-(--color-primary)"
+            />
+            {query && (
+              <button type="button" onClick={() => setQuery("")} aria-label="سڕینەوەی گەڕان" className="absolute end-3 top-1/2 -translate-y-1/2 text-(--color-text-muted)">
+                <XCircleIcon className="size-4" />
+              </button>
+            )}
+          </label>
+          {query && (
+            <div className="mt-2 overflow-hidden rounded-[8px] border border-(--color-border) bg-white/95 shadow-(--shadow-elevated) backdrop-blur">
+              {visibleDestinations.length ? visibleDestinations.slice(0, 5).map((destination) => (
+                <button key={destination.id} type="button" onClick={() => selectDestination(destination)} className="flex w-full items-center gap-3 border-b border-(--color-border) px-3 py-2.5 text-start last:border-0 hover:bg-(--color-primary-50)">
+                  <MapPinIcon className="size-4 shrink-0 text-(--color-accent-dark)" />
+                  <span className="min-w-0 flex-1 truncate text-sm font-semibold text-(--color-text-primary)">{destination.name}</span>
+                  <span className="truncate text-xs text-(--color-text-muted)">{destination.governorate}</span>
+                </button>
+              )) : <p className="px-3 py-3 text-sm text-(--color-text-secondary)">هیچ شوێنێک نەدۆزرایەوە.</p>}
+            </div>
+          )}
+        </div>
+
+        <div className="absolute bottom-4 start-4 z-[1000] flex items-center gap-2 rounded-full border border-white/70 bg-white/90 px-3 py-2 text-xs font-semibold text-(--color-text-secondary) shadow-(--shadow-medium) backdrop-blur">
+          <MapPinIcon className="size-4 text-(--color-accent-dark)" />
+          {visibleDestinations.length} شوێن
+        </div>
+
         {selected && (
-          <div
-            className="absolute z-30 hidden w-64 -translate-x-1/2 rounded-(--radius-lg) bg-(--color-surface) p-4 shadow-(--shadow-floating) lg:block"
-            style={{
-              top: `calc(${projectLatLng(selected.lat, selected.lng).top}% + 2.5rem)`,
-              left: `${projectLatLng(selected.lat, selected.lng).left}%`,
-            }}
-          >
+          <div className="absolute bottom-4 end-4 z-[1000] hidden w-72 rounded-[8px] border border-(--color-border) bg-white p-4 shadow-(--shadow-floating) lg:block">
+            <button type="button" onClick={() => setSelectedId(null)} aria-label="داخستنی زانیاری شوێن" className="absolute end-3 top-3 text-(--color-text-muted) hover:text-(--color-text-primary)">
+              <XCircleIcon className="size-5" />
+            </button>
             <MapPreviewCard destination={selected} />
           </div>
         )}
       </div>
 
-      {/* Desktop side result list */}
       <aside className="hidden w-96 shrink-0 overflow-y-auto border-s border-(--color-border) bg-(--color-surface) lg:block">
         <div className="border-b border-(--color-border) p-4">
           <h1 className="text-lg font-extrabold text-(--color-text-primary)">شوێنەکان لەسەر نەخشە</h1>
-          <p className="text-sm text-(--color-text-secondary)">{DESTINATIONS.length} شوێن لە کوردستان</p>
+          <p className="mt-1 text-sm text-(--color-text-secondary)">{visibleDestinations.length} شوێن لە کوردستان و جیهان</p>
         </div>
         <div className="flex flex-col gap-2 p-4">
-          {DESTINATIONS.map((d) => (
-            <div
+          {visibleDestinations.map((d) => (
+            <button
               key={d.id}
+              type="button"
               ref={(el) => {
                 listRefs.current[d.id] = el;
               }}
               onClick={() => selectDestination(d)}
               className={cn(
-                "flex cursor-pointer gap-3 rounded-(--radius-md) border p-3 transition-colors",
+                "flex w-full gap-3 rounded-[8px] border p-3 text-start transition-colors",
                 selectedId === d.id ? "border-(--color-primary) bg-(--color-primary-50)" : "border-transparent hover:bg-(--color-surface-elevated)"
               )}
             >
@@ -125,7 +134,7 @@ export default function MapExplorerPage() {
                 <p className="text-xs text-(--color-text-muted)">{d.governorate}</p>
                 <Rating value={d.rating} reviewCount={d.reviewCount} size="sm" />
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </aside>
@@ -136,6 +145,16 @@ export default function MapExplorerPage() {
       </BottomSheet>
     </div>
   );
+}
+
+function MapFollowSelection({ destination }: { destination: Destination | null }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (destination) map.flyTo([destination.lat, destination.lng], Math.max(map.getZoom(), 9), { duration: 0.7 });
+  }, [destination, map]);
+
+  return null;
 }
 
 function MapPreviewCard({ destination }: { destination: Destination }) {

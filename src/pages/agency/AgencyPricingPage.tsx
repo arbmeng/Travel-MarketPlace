@@ -25,7 +25,7 @@ export default function AgencyPricingPage() {
             گەشتەکانت بگەیەنە هەزاران گەشتیار
           </h1>
           <p className="mt-4 max-w-lg text-balance text-white/85">
-            بازاڕی زاگرۆس یارمەتیت دەدات گەشتیاری زیاتر بدۆزیتەوە، بەبێ خەرجی پێشوەختە — تەنها کۆمیسیۆنێکی ڕوون لەسەر هەر حیجزێکی سەرکەوتوو.
+            Zerrin.Travel یارمەتیت دەدات گەشتیاری زیاتر بدۆزیتەوە، بەبێ خەرجی پێشوەختە — تەنها کۆمیسیۆنێکی ڕوون لەسەر هەر حیجزێکی سەرکەوتوو.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Link to="/agency/onboarding" className={buttonClassName("secondary", "lg")}>
@@ -59,7 +59,7 @@ export default function AgencyPricingPage() {
           <div className="mx-auto max-w-xl text-center">
             <h2 className="text-2xl font-extrabold text-(--color-text-primary) sm:text-3xl">کۆمیسیۆن و کرێی ڕوون</h2>
             <p className="mt-3 text-(--color-text-secondary)">
-              نرخەکانی خوارەوە نموونەیەکی ئێستان و دەتوانرێت بەگوێرەی ڕێککەوتن لەگەڵ تیمی زاگرۆس جیاواز بێت. هیچ خەرجی شاراوەیەک نییە — هەموو ڕەقەم لە پەڕەی پارەدانت بە ڕوونی دەردەکەوێت.
+              نرخەکانی خوارەوە نموونەیەکی ئێستان و دەتوانرێت بەگوێرەی ڕێککەوتن لەگەڵ تیمی Zerrin.Travel جیاواز بێت. هیچ خەرجی شاراوەیەک نییە — هەموو ڕەقەم لە پەڕەی پارەدانت بە ڕوونی دەردەکەوێت.
             </p>
           </div>
 
@@ -97,7 +97,7 @@ export default function AgencyPricingPage() {
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
           <Feature icon={ChartIcon} title="شیکاریی تەواو" body="ڕاپۆرتی هەفتانە و مانگانەی داهات، حیجز و ڕەفتاری گەشتیاران." />
           <Feature icon={WalletIcon} title="پارەدانی خێرا" body="پارەدانی خۆکار بۆ حسابی بانکیت بەپێی خشتەیەک کە خۆت هەڵدەبژێریت." />
-          <Feature icon={UsersIcon} title="پشتگیری تیمی" body="تیمی پشتگیری زاگرۆس هەمیشە ئامادەیە بۆ یارمەتیدانت." />
+          <Feature icon={UsersIcon} title="پشتگیری تیمی" body="تیمی پشتگیری Zerrin.Travel هەمیشە ئامادەیە بۆ یارمەتیدانت." />
         </div>
       </section>
 

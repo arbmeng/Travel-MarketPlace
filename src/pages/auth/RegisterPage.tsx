@@ -8,6 +8,7 @@ export default function RegisterPage() {
   const navigate = useNavigate();
   const [form, setForm] = useState({ fullName: "", email: "", phone: "", password: "" });
   const [agreed, setAgreed] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const canSubmit = form.fullName.trim() && (form.email.trim() || form.phone.trim()) && form.password.trim() && agreed;
 
@@ -20,7 +21,7 @@ export default function RegisterPage() {
   return (
     <AuthLayout
       title="هەژمار درووستبکە"
-      subtitle="خۆت تۆمار بکە و دەستپێبکە بە دۆزینەوەی گەشتی ڕاستەقینەی کوردستان."
+      subtitle="خۆت تۆمار بکە و دەستپێبکە بە دۆزینەوەی گەشت لە کوردستان و جیهان."
       footer={
         <span className="text-(--color-text-secondary)">
           هەژمارت هەیە؟{" "}
@@ -41,6 +42,8 @@ export default function RegisterPage() {
         <Input
           label="ئیمەیل"
           type="email"
+          autoComplete="email"
+          required={!form.phone.trim()}
           value={form.email}
           onChange={(e) => setForm({ ...form, email: e.target.value })}
           placeholder="name@example.com"
@@ -49,23 +52,34 @@ export default function RegisterPage() {
           label="ژمارەی مۆبایل"
           hint="ئیمەیل یان مۆبایل، بەلایەنی کەم یەکێکیان پێویستە"
           type="tel"
+          autoComplete="tel"
+          required={!form.email.trim()}
           value={form.phone}
           onChange={(e) => setForm({ ...form, phone: e.target.value })}
           placeholder="+964 7XX XXX XXXX"
         />
-        <Input
-          label="وشەی نهێنی"
-          required
-          type="password"
-          value={form.password}
-          onChange={(e) => setForm({ ...form, password: e.target.value })}
-          hint="بەلایەنی کەم ٨ پیت"
-        />
+        <div className="relative">
+          <Input
+            label="وشەی نهێنی"
+            required
+            minLength={8}
+            autoComplete="new-password"
+            type={showPassword ? "text" : "password"}
+            className="pe-20"
+            value={form.password}
+            onChange={(e) => setForm({ ...form, password: e.target.value })}
+            hint="بەلایەنی کەم ٨ پیت"
+          />
+          <button type="button" onClick={() => setShowPassword((visible) => !visible)} aria-pressed={showPassword} className="absolute end-3 top-[38px] rounded px-2 py-1 text-xs font-semibold text-(--color-text-muted) hover:text-(--color-primary)">
+            {showPassword ? "شاردن" : "پیشاندان"}
+          </button>
+        </div>
         <label className="flex items-start gap-2.5 text-sm text-(--color-text-primary) cursor-pointer">
           <input
             type="checkbox"
             checked={agreed}
             onChange={(e) => setAgreed(e.target.checked)}
+            required
             className="mt-0.5 size-5 shrink-0 rounded-(--radius-xs) border-(--color-border) text-(--color-primary) focus:ring-(--color-primary)"
           />
           <span>
@@ -79,7 +93,7 @@ export default function RegisterPage() {
             </Link>
           </span>
         </label>
-        <Button type="submit" fullWidth disabled={!canSubmit}>
+        <Button type="submit" fullWidth>
           خۆتۆمارکردن
         </Button>
       </form>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { buttonClassName } from "@/components/ui/Button";
 import { Rating } from "@/components/ui/Rating";
@@ -7,7 +7,7 @@ import { TripCard } from "@/components/cards/TripCard";
 import { DestinationCard, DestinationChip } from "@/components/cards/DestinationCard";
 import { AgencyCard } from "@/components/cards/AgencyCard";
 import { ReviewCard } from "@/components/cards/ReviewCard";
-import { CalendarIcon, MapPinIcon, SearchIcon, UsersIcon } from "@/components/icons";
+import { CalendarIcon, ChevronRightIcon, MapPinIcon, SearchIcon, UsersIcon } from "@/components/icons";
 import { AGENCIES, DESTINATIONS, REVIEWS, TRIPS } from "@/data/mock";
 import { MOUNTAIN_IMAGES } from "@/data/images";
 import { TRIP_CATEGORY_LABELS, type TripCategory } from "@/types";
@@ -19,6 +19,8 @@ export default function HomePage() {
   const domesticDestinations = DESTINATIONS.filter((d) => d.scope === "domestic");
   const internationalDestinations = DESTINATIONS.filter((d) => d.scope === "international");
   const internationalTrips = TRIPS.filter((t) => t.scope === "international");
+  const featuredTrips = TRIPS.filter((t) => t.featured && t.status === "published");
+  const sponsoredTrips = TRIPS.filter((t) => t.sponsored && t.status === "published");
   const featuredDestinations = domesticDestinations.filter((d) => d.featured);
   const trending = [...TRIPS].sort((a, b) => b.reviewCount - a.reviewCount).slice(0, 4);
   const weekend = TRIPS.filter((t) => t.scope === "domestic" && t.duration <= 2).slice(0, 4);
@@ -91,6 +93,9 @@ export default function HomePage() {
         </div>
       </Section>
 
+      <TripRail title="گەشتە دیارەکان" subtitle="گەشتە هەڵبژێردراوەکان بۆ ئەزموونێکی تایبەت" trips={featuredTrips} />
+      <TripRail title="گەشتی سپۆنسەرکراو" subtitle="پێشکەشکراو لەلایەن ئەژانسە هاوبەشەکان" trips={sponsoredTrips} tone="sponsored" />
+
       {/* Explore by category */}
       <Section title="بەپێی جۆر بگەڕێ" subtitle="ئەزموونی گونجاو بۆ خۆت هەڵبژێرە">
         <div className="mb-6 flex flex-wrap gap-2">
@@ -147,7 +152,7 @@ export default function HomePage() {
       </Section>
 
       {/* International trips */}
-      <Section title="گەشتی دەرەوەی وڵات" subtitle="جیهان لەگەڵ زاگرۆس بناسە — لە ئیستانبوڵ هەتا دوبەی و قاهیرە" tone="elevated">
+      <Section title="گەشتی دەرەوەی وڵات" subtitle="جیهان لەگەڵ Zerrin.Travel بناسە — لە ئیستانبوڵ هەتا دوبەی و قاهیرە" tone="elevated">
         <div className="mb-6 flex gap-4 overflow-x-auto scrollbar-none pb-2">
           {internationalDestinations.map((d) => (
             <DestinationChip key={d.id} destination={d} />
@@ -175,7 +180,7 @@ export default function HomePage() {
       </Section>
 
       {/* Reviews */}
-      <Section title="گەشتیاران چی دەڵێن" subtitle="ئەزموونی ڕاستەقینەی گەشتیارانی زاگرۆس">
+      <Section title="گەشتیاران چی دەڵێن" subtitle="ئەزموونی ڕاستەقینەی گەشتیارانی Zerrin.Travel">
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {REVIEWS.map((r) => (
             <ReviewCard key={r.id} review={r} />
@@ -189,13 +194,64 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-(--color-primary-dark)/70" />
         <div className="relative z-10 flex flex-col items-center gap-5 px-6 py-20 text-center text-white">
           <h2 className="text-balance text-3xl font-extrabold sm:text-4xl">گەشتەکەت لە ئێستا دەست پێ بکە</h2>
-          <p className="max-w-md text-white/85">هەزاران گەشتیار ئەزموونی ڕەسەنیان لەگەڵ زاگرۆس دۆزیوەتەوە. تۆش دەست پێ بکە.</p>
+          <p className="max-w-md text-white/85">هەزاران گەشتیار ئەزموونی ڕەسەنیان لەگەڵ Zerrin.Travel دۆزیوەتەوە. تۆش دەست پێ بکە.</p>
           <Link to="/explore" className={buttonClassName("secondary", "lg")}>
             دەستپێکردن
           </Link>
         </div>
       </section>
     </div>
+  );
+}
+
+function TripRail({
+  title,
+  subtitle,
+  trips,
+  tone = "default",
+}: {
+  title: string;
+  subtitle: string;
+  trips: typeof TRIPS;
+  tone?: "default" | "elevated" | "sponsored";
+}) {
+  const railRef = useRef<HTMLDivElement>(null);
+
+  function move(direction: "next" | "previous") {
+    const rail = railRef.current;
+    if (!rail) return;
+    const rtl = getComputedStyle(rail).direction === "rtl";
+    const sign = (direction === "next" ? 1 : -1) * (rtl ? -1 : 1);
+    rail.scrollBy({ left: sign * Math.max(rail.clientWidth * 0.8, 280), behavior: "smooth" });
+  }
+
+  return (
+    <section className={tone === "elevated" ? "bg-(--color-surface-elevated)" : tone === "sponsored" ? "bg-(--color-primary-dark)" : undefined}>
+      <div className="mx-auto max-w-(--breakpoint-2xl) px-4 py-10 sm:px-6 lg:py-12">
+        <div className="mb-6 flex items-end justify-between gap-4">
+          <div>
+            {tone === "sponsored" && <span className="mb-2 inline-flex rounded-full bg-(--color-accent) px-2.5 py-1 text-[11px] font-extrabold text-(--color-primary-dark)">سپۆنسەرکراو</span>}
+            <h2 className={`text-2xl font-extrabold ${tone === "sponsored" ? "text-white" : "text-(--color-text-primary)"}`}>{title}</h2>
+            <p className={`mt-1.5 text-sm ${tone === "sponsored" ? "text-white/70" : "text-(--color-text-secondary)"}`}>{subtitle}</p>
+          </div>
+          <div className="flex shrink-0 gap-2" dir="ltr">
+            <button type="button" onClick={() => move("previous")} aria-label="گەشتی پێشوو" className={`flex size-10 items-center justify-center rounded-[8px] border transition-colors ${tone === "sponsored" ? "border-white/25 bg-white/10 text-white hover:bg-white/20" : "border-(--color-border) bg-(--color-surface) text-(--color-text-primary) hover:bg-(--color-primary-50)"}`}>
+              <ChevronRightIcon className="size-4" />
+            </button>
+            <button type="button" onClick={() => move("next")} aria-label="گەشتی داهاتوو" className={`flex size-10 items-center justify-center rounded-[8px] border transition-colors ${tone === "sponsored" ? "border-white/25 bg-white/10 text-white hover:bg-white/20" : "border-(--color-border) bg-(--color-surface) text-(--color-text-primary) hover:bg-(--color-primary-50)"}`}>
+              <ChevronRightIcon className="size-4 rotate-180" />
+            </button>
+          </div>
+        </div>
+        <div ref={railRef} dir="rtl" aria-label={title} className="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth scrollbar-none pb-2">
+          {trips.map((trip) => (
+            <div key={trip.id} className="w-[min(82vw,19rem)] shrink-0 snap-start sm:w-[calc((100%-1rem)/2)] lg:w-[calc((100%-2rem)/3)]">
+              <TripCard trip={trip} className="h-full" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 

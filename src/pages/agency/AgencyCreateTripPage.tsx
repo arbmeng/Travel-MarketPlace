@@ -52,6 +52,7 @@ interface Draft {
   whatToBring: string[];
   freeUntilDays: number;
   feePercentAfter: number;
+  sponsored: boolean;
 }
 
 function blankDraft(): Draft {
@@ -79,6 +80,7 @@ function blankDraft(): Draft {
     whatToBring: [],
     freeUntilDays: 3,
     feePercentAfter: 30,
+    sponsored: false,
   };
 }
 
@@ -107,6 +109,7 @@ function draftFromTrip(trip: Trip): Draft {
     whatToBring: trip.whatToBring,
     freeUntilDays: trip.cancellationPolicy.freeUntilDays,
     feePercentAfter: trip.cancellationPolicy.feePercentAfter,
+    sponsored: trip.sponsored ?? false,
   };
 }
 
@@ -132,7 +135,7 @@ export default function AgencyCreateTripPage() {
     setStep((s) => Math.max(0, s - 1));
   }
   function submit() {
-    push(isEdit ? "گۆڕانکارییەکان پاشەکەوت کران" : "گەشت نێردرا بۆ پێداچوونەوە");
+    push(draft.sponsored ? "داواکاریی گەشتی سپۆنسەرکراو نێردرا بۆ پێداچوونەوە" : isEdit ? "گۆڕانکارییەکان پاشەکەوت کران" : "گەشت نێردرا بۆ پێداچوونەوە");
     navigate("/agency/trips");
   }
 
@@ -281,8 +284,15 @@ export default function AgencyCreateTripPage() {
             <Badge tone="primary">ئامادەیە بۆ ناردن</Badge>
             <h2 className="text-lg font-bold text-(--color-text-primary)">{draft.title || "گەشتی نوێ"}</h2>
             <p className="max-w-md text-sm text-(--color-text-secondary)">
-              دوای ناردن، تیمی زاگرۆس گەشتەکەت پێداچوونەوەی بۆ دەکات و لە ماوەی ١-٢ ڕۆژدا وەڵامت دەداتەوە.
+              دوای ناردن، تیمی Zerrin.Travel گەشتەکەت پێداچوونەوەی بۆ دەکات و لە ماوەی ١-٢ ڕۆژدا وەڵامت دەداتەوە.
             </p>
+            <label className="mt-2 flex w-full max-w-lg cursor-pointer items-start gap-3 rounded-[8px] border border-(--color-border) bg-(--color-surface) p-4 text-start">
+              <input type="checkbox" checked={draft.sponsored} onChange={(event) => set("sponsored", event.target.checked)} className="mt-1 size-4 shrink-0 accent-(--color-accent)" />
+              <span>
+                <span className="block text-sm font-bold text-(--color-text-primary)">داوای شوێنی سپۆنسەرکراو بکە</span>
+                <span className="mt-1 block text-xs leading-5 text-(--color-text-secondary)">ئەژانسەکەت داوای دیاریکردنی ئەم گەشتە وەک سپۆنسەرکراو دەکات. پێش بڵاوکردنەوە، تیمی Zerrin.Travel داواکارییەکە پێداچوونەوەی بۆ دەکات.</span>
+              </span>
+            </label>
           </div>
         )}
 

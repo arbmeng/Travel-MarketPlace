@@ -7,8 +7,8 @@ import { Switch } from "@/components/ui/Input";
 import { BottomSheet } from "@/components/ui/Modal";
 import { EmptyState, TripCardSkeleton } from "@/components/ui/States";
 import { TripCard } from "@/components/cards/TripCard";
-import { FilterIcon, MapPinIcon, SearchIcon } from "@/components/icons";
-import { COUNTRIES, DESTINATIONS, GOVERNORATES, TRIPS, getDestinationById } from "@/data/mock";
+import { CompassIcon, FilterIcon, GlobeIcon, MapPinIcon, SearchIcon, XCircleIcon, ChevronDownIcon } from "@/components/icons";
+import { COUNTRIES, DESTINATIONS, GOVERNORATES, TRIPS, getAgencyById, getDestinationById } from "@/data/mock";
 import { formatNumber } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { DIFFICULTY_LABELS, TRAVEL_SCOPE_LABELS, TRIP_CATEGORY_LABELS, type Difficulty, type Trip, type TravelScope, type TripCategory } from "@/types";
@@ -104,19 +104,29 @@ function matchesFilters(trip: Trip, filters: Filters): boolean {
   return true;
 }
 
+function matchesSearch(trip: Trip, query: string): boolean {
+  const normalizedQuery = query.trim().toLocaleLowerCase();
+  if (!normalizedQuery) return true;
+  const destination = getDestinationById(trip.destinationId);
+  const agency = getAgencyById(trip.agencyId);
+  return [trip.title, trip.description, destination?.name, destination?.governorate, agency?.name, agency?.location]
+    .some((value) => value?.toLocaleLowerCase().includes(normalizedQuery));
+}
+
 function sortTrips(list: Trip[], key: SortKey): Trip[] {
   const arr = [...list];
+  const sponsoredFirst = (a: Trip, b: Trip) => Number(Boolean(b.sponsored)) - Number(Boolean(a.sponsored));
   switch (key) {
     case "popular":
-      return arr.sort((a, b) => b.reviewCount - a.reviewCount);
+      return arr.sort((a, b) => sponsoredFirst(a, b) || b.reviewCount - a.reviewCount);
     case "rating":
-      return arr.sort((a, b) => b.rating - a.rating);
+      return arr.sort((a, b) => sponsoredFirst(a, b) || b.rating - a.rating);
     case "price_low":
-      return arr.sort((a, b) => a.priceIqd - b.priceIqd);
+      return arr.sort((a, b) => sponsoredFirst(a, b) || a.priceIqd - b.priceIqd);
     case "newest":
-      return arr.reverse();
+      return arr.reverse().sort(sponsoredFirst);
     default:
-      return arr.sort((a, b) => b.rating * b.reviewCount - a.rating * a.reviewCount);
+      return arr.sort((a, b) => sponsoredFirst(a, b) || b.rating * b.reviewCount - a.rating * a.reviewCount);
   }
 }
 
@@ -127,10 +137,11 @@ export default function ExplorePage() {
     return urlScope === "domestic" || urlScope === "international" ? { ...DEFAULT_FILTERS, scope: urlScope } : DEFAULT_FILTERS;
   });
   const [sortKey, setSortKey] = useState<SortKey>("recommended");
+  const [query, setQuery] = useState("");
   const [sheetOpen, setSheetOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const filtersKey = JSON.stringify(filters);
+  const filtersKey = `${JSON.stringify(filters)}|${query}`;
   useEffect(() => {
     setLoading(true);
     const t = setTimeout(() => setLoading(false), 280);
@@ -138,7 +149,10 @@ export default function ExplorePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filtersKey]);
 
-  const results = useMemo(() => sortTrips(TRIPS.filter((t) => matchesFilters(t, filters)), sortKey), [filters, sortKey]);
+  const results = useMemo(
+    () => sortTrips(TRIPS.filter((trip) => matchesFilters(trip, filters) && matchesSearch(trip, query)), sortKey),
+    [filters, query, sortKey]
+  );
 
   const activeFilterCount =
     (filters.destinationId !== "all" ? 1 : 0) +
@@ -152,25 +166,66 @@ export default function ExplorePage() {
     (filters.privateOnly ? 1 : 0) +
     (filters.transportation !== "all" ? 1 : 0) +
     (filters.accommodation !== "all" ? 1 : 0) +
-    filters.activities.length;
+    filters.activities.length +
+    (query.trim() ? 1 : 0);
 
   function update<K extends keyof Filters>(key: K, value: Filters[K]) {
     setFilters((f) => ({ ...f, [key]: value }));
   }
 
+  function resetFilters() {
+    setFilters(DEFAULT_FILTERS);
+    setQuery("");
+  }
+
   return (
     <div className="mx-auto max-w-(--breakpoint-2xl) px-4 py-8 sm:px-6 lg:py-10">
-      <div className="mb-6 flex flex-col gap-3">
-        <h1 className="text-2xl font-extrabold text-(--color-text-primary) sm:text-3xl">بگەڕێ بۆ گەشتەکان</h1>
-        <p className="text-(--color-text-secondary)">
-          <span className="num font-semibold text-(--color-text-primary)">{results.length}</span> گەشت دۆزرایەوە
-        </p>
-        <div className="flex flex-wrap gap-2">
-          {SCOPE_OPTIONS.map((s) => (
-            <Chip key={s} selected={filters.scope === s} onClick={() => update("scope", s)}>
-              {s === "all" ? "هەموو گەشتەکان" : TRAVEL_SCOPE_LABELS[s]}
-            </Chip>
-          ))}
+      <div className="mb-6 flex flex-col gap-5">
+        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div>
+            <h1 className="text-2xl font-extrabold text-(--color-text-primary) sm:text-3xl">بگەڕێ بۆ گەشتەکان</h1>
+            <p className="mt-1.5 text-sm text-(--color-text-secondary)">
+              <span className="num font-semibold text-(--color-text-primary)">{results.length}</span> گەشت دۆزرایەوە
+            </p>
+          </div>
+          <label className="relative block w-full md:max-w-md">
+            <SearchIcon className="pointer-events-none absolute start-4 top-1/2 size-5 -translate-y-1/2 text-(--color-text-muted)" />
+            <input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="ناوی گەشت، شوێن یان ئەژانس بگەڕێ..."
+              aria-label="گەڕان لە گەشتەکان"
+              className="h-12 w-full rounded-[8px] border border-(--color-border) bg-(--color-surface) ps-11 pe-11 text-sm text-(--color-text-primary) shadow-(--shadow-subtle) placeholder:text-(--color-text-muted) focus:border-(--color-primary)"
+            />
+            {query && (
+              <button type="button" onClick={() => setQuery("")} aria-label="سڕینەوەی گەڕان" className="absolute end-3.5 top-1/2 -translate-y-1/2 text-(--color-text-muted) hover:text-(--color-text-primary)">
+                <XCircleIcon className="size-5" />
+              </button>
+            )}
+          </label>
+        </div>
+        <div role="group" aria-label="جۆری گەشت" className="grid w-full max-w-2xl grid-cols-3 gap-1 rounded-[8px] border border-(--color-border) bg-(--color-surface-elevated) p-1.5">
+          {SCOPE_OPTIONS.map((scope) => {
+            const selected = filters.scope === scope;
+            const count = scope === "all" ? TRIPS.length : TRIPS.filter((trip) => trip.scope === scope).length;
+            const ScopeIcon = scope === "all" ? CompassIcon : scope === "domestic" ? MapPinIcon : GlobeIcon;
+            return (
+              <button
+                key={scope}
+                type="button"
+                aria-pressed={selected}
+                onClick={() => update("scope", scope)}
+                className={cn(
+                  "flex min-h-12 items-center justify-center gap-2 rounded-[6px] px-2.5 text-sm font-bold transition-colors sm:px-4",
+                  selected ? "bg-(--color-primary-dark) text-white shadow-(--shadow-subtle)" : "text-(--color-text-secondary) hover:bg-white/80"
+                )}
+              >
+                <ScopeIcon className="size-4 shrink-0" />
+                <span className="truncate">{scope === "all" ? "هەموو گەشتەکان" : TRAVEL_SCOPE_LABELS[scope]}</span>
+                <span className={cn("num hidden text-xs sm:inline", selected ? "text-white/70" : "text-(--color-text-muted)")}>{count}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -200,14 +255,18 @@ export default function ExplorePage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[280px_1fr]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[300px_1fr] xl:gap-8">
         {/* Desktop sidebar */}
         <aside className="hidden lg:block">
-          <div className="sticky top-24 flex flex-col gap-6 rounded-(--radius-lg) border border-(--color-border) bg-(--color-surface) p-5">
+          <div className="sticky top-24 flex max-h-[calc(100dvh-7rem)] flex-col gap-4 overflow-y-auto rounded-[8px] border border-(--color-border) bg-(--color-surface) p-4 shadow-(--shadow-subtle)">
             <div className="flex items-center justify-between">
-              <h2 className="font-bold text-(--color-text-primary)">فلتەرەکان</h2>
+              <div className="flex items-center gap-2">
+                <FilterIcon className="size-4 text-(--color-primary)" />
+                <h2 className="font-bold text-(--color-text-primary)">فلتەرەکان</h2>
+                {activeFilterCount > 0 && <span className="num flex size-5 items-center justify-center rounded-full bg-(--color-primary-50) text-[11px] font-bold text-(--color-primary-dark)">{activeFilterCount}</span>}
+              </div>
               {activeFilterCount > 0 && (
-                <button type="button" onClick={() => setFilters(DEFAULT_FILTERS)} className="text-xs font-semibold text-(--color-primary)">
+                <button type="button" onClick={resetFilters} className="text-xs font-semibold text-(--color-secondary-dark) hover:underline">
                   سڕینەوەی هەموو
                 </button>
               )}
@@ -243,7 +302,7 @@ export default function ExplorePage() {
               title="هیچ گەشتێک نەدۆزرایەوە"
               description="فلتەرەکانت کەم بکەرەوە یان فلتەرەکان بسڕەوە بۆ بینینی هەموو گەشتەکان."
               action={
-                <button type="button" onClick={() => setFilters(DEFAULT_FILTERS)} className={buttonClassName("outline", "md")}>
+                <button type="button" onClick={resetFilters} className={buttonClassName("outline", "md")}>
                   سڕینەوەی فلتەرەکان
                 </button>
               }
@@ -265,7 +324,7 @@ export default function ExplorePage() {
         title="فلتەرەکان"
         footer={
           <div className="flex w-full gap-3">
-            <button type="button" onClick={() => setFilters(DEFAULT_FILTERS)} className={buttonClassName("outline", "md", { fullWidth: true })}>
+            <button type="button" onClick={resetFilters} className={buttonClassName("outline", "md", { fullWidth: true })}>
               سڕینەوەی هەموو
             </button>
             <button type="button" onClick={() => setSheetOpen(false)} className={buttonClassName("primary", "md", { fullWidth: true })}>
@@ -280,19 +339,22 @@ export default function ExplorePage() {
   );
 }
 
-function FilterGroup({ title, children }: { title: string; children: React.ReactNode }) {
+function FilterGroup({ title, children, defaultOpen = false }: { title: string; children: React.ReactNode; defaultOpen?: boolean }) {
   return (
-    <div className="flex flex-col gap-2.5 border-b border-(--color-border) pb-5 last:border-0 last:pb-0">
-      <h3 className="text-sm font-bold text-(--color-text-primary)">{title}</h3>
-      {children}
-    </div>
+    <details open={defaultOpen} className="group border-b border-(--color-border) pb-3 last:border-0 last:pb-0">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 py-1 text-[13px] font-bold text-(--color-text-primary)">
+        {title}
+        <ChevronDownIcon className="size-4 shrink-0 text-(--color-text-muted) transition-transform group-open:rotate-180" />
+      </summary>
+      <div className="pt-3">{children}</div>
+    </details>
   );
 }
 
 function FiltersPanel({ filters, update }: { filters: Filters; update: <K extends keyof Filters>(key: K, value: Filters[K]) => void }) {
   return (
     <div className="flex flex-col gap-5">
-      <FilterGroup title="شوێن">
+      <FilterGroup title="شوێن" defaultOpen>
         <Select value={filters.destinationId} onChange={(e) => update("destinationId", e.target.value)}>
           <option value="all">هەموو شوێنەکان</option>
           {DESTINATIONS.map((d) => (
@@ -303,7 +365,7 @@ function FiltersPanel({ filters, update }: { filters: Filters; update: <K extend
         </Select>
       </FilterGroup>
 
-      <FilterGroup title={filters.scope === "international" ? "وڵات" : "پارێزگا"}>
+      <FilterGroup title={filters.scope === "international" ? "وڵات" : "پارێزگا"} defaultOpen>
         <Select value={filters.governorate} onChange={(e) => update("governorate", e.target.value)}>
           <option value="all">{filters.scope === "international" ? "هەموو وڵاتان" : "هەموو پارێزگاکان"}</option>
           {(filters.scope === "international" ? COUNTRIES : GOVERNORATES).map((g) => (
@@ -314,10 +376,10 @@ function FiltersPanel({ filters, update }: { filters: Filters; update: <K extend
         </Select>
       </FilterGroup>
 
-      <FilterGroup title="جۆری گەشت">
-        <div className="flex flex-wrap gap-2">
+      <FilterGroup title="جۆری گەشت" defaultOpen>
+        <div className="grid grid-cols-2 gap-2">
           {CATEGORIES.map((c) => (
-            <Chip key={c} selected={filters.categories.includes(c)} onClick={() => update("categories", toggleInArray(filters.categories, c))}>
+            <Chip key={c} selected={filters.categories.includes(c)} onClick={() => update("categories", toggleInArray(filters.categories, c))} className="w-full justify-start rounded-[6px] px-2.5 text-xs">
               {TRIP_CATEGORY_LABELS[c]}
             </Chip>
           ))}
@@ -325,9 +387,9 @@ function FiltersPanel({ filters, update }: { filters: Filters; update: <K extend
       </FilterGroup>
 
       <FilterGroup title="ئاستی سەختی">
-        <div className="flex flex-wrap gap-2">
+        <div className="grid grid-cols-3 gap-2">
           {DIFFICULTIES.map((d) => (
-            <Chip key={d} selected={filters.difficulties.includes(d)} onClick={() => update("difficulties", toggleInArray(filters.difficulties, d))}>
+            <Chip key={d} selected={filters.difficulties.includes(d)} onClick={() => update("difficulties", toggleInArray(filters.difficulties, d))} className="justify-center rounded-[6px] px-2 text-xs">
               {DIFFICULTY_LABELS[d]}
             </Chip>
           ))}
@@ -335,9 +397,9 @@ function FiltersPanel({ filters, update }: { filters: Filters; update: <K extend
       </FilterGroup>
 
       <FilterGroup title="بەروار">
-        <div className="flex flex-wrap gap-2">
+        <div className="grid grid-cols-2 gap-2">
           {DURATION_BUCKETS.map((d) => (
-            <Chip key={d.key} selected={filters.duration === d.key} onClick={() => update("duration", d.key)}>
+            <Chip key={d.key} selected={filters.duration === d.key} onClick={() => update("duration", d.key)} className="w-full justify-start rounded-[6px] px-2.5 text-xs">
               {d.label}
             </Chip>
           ))}

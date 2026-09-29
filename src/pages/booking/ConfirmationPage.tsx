@@ -59,7 +59,7 @@ export default function ConfirmationPage() {
         </div>
         <h1 className="text-2xl font-extrabold text-(--color-text-primary) sm:text-3xl">حیجزەکەت سەرکەوتوو بوو</h1>
         <p className="max-w-sm text-(--color-text-secondary)">
-          پەیامی پشتڕاستکردنەوە بۆ ئیمەیل و مۆبایلەکەت نێردرا. چاوەڕوانی ئەزموونێکی خۆشین لەگەڵ زاگرۆس.
+          پەیامی پشتڕاستکردنەوە بۆ ئیمەیل و مۆبایلەکەت نێردرا. چاوەڕوانی ئەزموونێکی خۆشین لەگەڵ Zerrin.Travel.
         </p>
         <Badge tone="primary" className="num mt-1 text-sm">
           ژمارەی حیجز: {bookingNumber}

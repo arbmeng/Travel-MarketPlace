@@ -9,6 +9,7 @@ export default function LoginPage() {
   const [mode, setMode] = useState<"email" | "phone">("email");
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -28,12 +29,13 @@ export default function LoginPage() {
         </span>
       }
     >
-      <div className="mb-5 flex rounded-(--radius-pill) bg-(--color-surface-elevated) p-1">
+      <div role="group" aria-label="شێوازی چوونەژوورەوە" className="mb-5 grid grid-cols-2 gap-1 rounded-[8px] border border-(--color-border) bg-(--color-surface-elevated) p-1">
         <button
           type="button"
           onClick={() => setMode("email")}
-          className={`flex-1 rounded-(--radius-pill) py-2 text-sm font-semibold transition-colors cursor-pointer ${
-            mode === "email" ? "bg-(--color-surface) text-(--color-text-primary) shadow-(--shadow-subtle)" : "text-(--color-text-muted)"
+          aria-pressed={mode === "email"}
+          className={`min-h-11 rounded-[6px] text-sm font-semibold transition-colors cursor-pointer ${
+            mode === "email" ? "bg-white text-(--color-primary-dark) shadow-(--shadow-subtle)" : "text-(--color-text-muted)"
           }`}
         >
           بە ئیمەیل
@@ -41,8 +43,9 @@ export default function LoginPage() {
         <button
           type="button"
           onClick={() => setMode("phone")}
-          className={`flex-1 rounded-(--radius-pill) py-2 text-sm font-semibold transition-colors cursor-pointer ${
-            mode === "phone" ? "bg-(--color-surface) text-(--color-text-primary) shadow-(--shadow-subtle)" : "text-(--color-text-muted)"
+          aria-pressed={mode === "phone"}
+          className={`min-h-11 rounded-[6px] text-sm font-semibold transition-colors cursor-pointer ${
+            mode === "phone" ? "bg-white text-(--color-primary-dark) shadow-(--shadow-subtle)" : "text-(--color-text-muted)"
           }`}
         >
           بە مۆبایل
@@ -54,12 +57,18 @@ export default function LoginPage() {
           label={mode === "email" ? "ئیمەیل" : "ژمارەی مۆبایل"}
           required
           type={mode === "email" ? "email" : "tel"}
+          autoComplete={mode === "email" ? "email" : "tel"}
           value={identifier}
           onChange={(e) => setIdentifier(e.target.value)}
           placeholder={mode === "email" ? "name@example.com" : "+964 7XX XXX XXXX"}
         />
         <div>
-          <Input label="وشەی نهێنی" required type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+          <div className="relative">
+            <Input label="وشەی نهێنی" required type={showPassword ? "text" : "password"} autoComplete="current-password" className="pe-20" value={password} onChange={(e) => setPassword(e.target.value)} />
+            <button type="button" onClick={() => setShowPassword((visible) => !visible)} aria-pressed={showPassword} className="absolute end-3 top-[38px] rounded px-2 py-1 text-xs font-semibold text-(--color-text-muted) hover:text-(--color-primary)">
+              {showPassword ? "شاردن" : "پیشاندان"}
+            </button>
+          </div>
           <div className="mt-2 text-end">
             <Link to="/support" className="text-xs font-semibold text-(--color-primary) hover:underline">
               وشەی نهێنیت لەبیرکردووە؟
@@ -70,21 +79,6 @@ export default function LoginPage() {
           چوونەژوورەوە
         </Button>
       </form>
-
-      <div className="my-6 flex items-center gap-3 text-xs text-(--color-text-muted)">
-        <div className="h-px flex-1 bg-(--color-border)" />
-        یان
-        <div className="h-px flex-1 bg-(--color-border)" />
-      </div>
-
-      <div className="flex flex-col gap-3">
-        <Button variant="outline" fullWidth type="button" onClick={() => navigate("/account")}>
-          چوونەژوورەوە بە Google
-        </Button>
-        <Button variant="outline" fullWidth type="button" onClick={() => navigate("/account")}>
-          چوونەژوورەوە بە Apple
-        </Button>
-      </div>
     </AuthLayout>
   );
 }

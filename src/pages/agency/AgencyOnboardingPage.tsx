@@ -24,7 +24,7 @@ const LANGUAGE_OPTIONS = ["کوردی", "عەرەبی", "ئینگلیزی", "ف�
 
 const VERIFICATION_STEPS: { status: VerificationStatus; label: string; body: string }[] = [
   { status: "pending", label: "چاوەڕوان", body: "داواکارییەکەت وەرگیرا و لە ڕیزی پێداچوونەوەدایە." },
-  { status: "under_review", label: "لە پێداچوونەوەدایە", body: "تیمی زاگرۆس بەڵگەنامەکانت پێداچوونەوەیان بۆ دەکات." },
+  { status: "under_review", label: "لە پێداچوونەوەدایە", body: "تیمی Zerrin.Travel بەڵگەنامەکانت پێداچوونەوەیان بۆ دەکات." },
   { status: "verified", label: "پشتڕاستکراوە", body: "پیرۆزە! ئێستا دەتوانیت گەشتەکانت بڵاو بکەیتەوە." },
   { status: "needs_changes", label: "پێویستی بە گۆڕانکارییە", body: "هەندێک زانیاری پێویستە ڕاست بکرێتەوە، سەیری ئیمەیلەکەت بکە." },
   { status: "rejected", label: "ڕەتکراوەتەوە", body: "داواکارییەکەت لەم قۆناغەدا پەسەند نەکراوە. دەتوانیت پەیوەندیمان پێوە بکەیت." },
@@ -48,7 +48,7 @@ export default function AgencyOnboardingPage() {
   }
 
   return (
-    <AuthLayout title="خۆتۆمارکردنی ئەژانس" subtitle="چەند هەنگاوی سادە بۆ دەستپێکردنی گەشتت لەسەر زاگرۆس.">
+    <AuthLayout title="خۆتۆمارکردنی ئەژانس" subtitle="چەند هەنگاوی سادە بۆ دەستپێکردنی گەشتت لەسەر Zerrin.Travel.">
       <div className="mb-8 -mx-2">
         <Stepper steps={STEPS} current={step} />
       </div>

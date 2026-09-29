@@ -126,7 +126,7 @@ export default function SupportPage() {
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
               <ContactCard icon={<MessageIcon className="size-5" />} title="چات" desc="وەڵامی خێرا لە ماوەی چەند خولەکێکدا" />
               <ContactCard icon={<SupportIcon className="size-5" />} title="تەلەفۆن" desc="+964 750 000 0000" />
-              <ContactCard icon={<SupportIcon className="size-5" />} title="ئیمەیل" desc="support@zagros.example" />
+              <ContactCard icon={<SupportIcon className="size-5" />} title="ئیمەیل" desc="support@zerrin.example" />
             </div>
           </div>
 
